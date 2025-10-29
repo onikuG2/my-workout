@@ -12,6 +12,7 @@ interface WorkoutPlayerProps {
 
 const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [currentSet, setCurrentSet] = useState(1);
   const [timeLeft, setTimeLeft] = useState(workout.exercises[0].duration);
   const [isPaused, setIsPaused] = useState(true);
   const [isFinished, setIsFinished] = useState(false);
@@ -52,6 +53,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
     oscillator.stop(audioContext.currentTime + 0.2);
   }, []);
 
+  // Timer countdown effect
   useEffect(() => {
     if (isPaused || isFinished) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -61,16 +63,10 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
     intervalRef.current = window.setInterval(() => {
       setTimeLeft(prevTime => {
         if (prevTime <= 1) {
-          if (currentExerciseIndex < workout.exercises.length - 1) {
-            playSound('end_exercise');
-            setCurrentExerciseIndex(prevIndex => prevIndex + 1);
-            return workout.exercises[currentExerciseIndex + 1].duration;
-          } else {
-            playSound('end_workout');
-            setIsFinished(true);
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            return 0;
-          }
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          playSound('end_exercise');
+          setIsPaused(true);
+          return 0;
         }
         if (prevTime > 1 && prevTime <= 4) {
           playSound('tick');
@@ -82,19 +78,60 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPaused, currentExerciseIndex, workout.exercises, isFinished, playSound]);
+  }, [isPaused, isFinished, playSound]);
 
-  const togglePause = () => {
+  // Effect to automatically transition to the next exercise view when all sets are done
+  useEffect(() => {
+    if (isPaused && timeLeft === 0 && !isFinished) {
+      const currentExercise = workout.exercises[currentExerciseIndex];
+      const totalSets = currentExercise.sets ?? 1;
+
+      if (currentSet >= totalSets) {
+        if (currentExerciseIndex < workout.exercises.length - 1) {
+          const nextExIndex = currentExerciseIndex + 1;
+          // Wait a brief moment before switching to make the transition feel less abrupt
+          setTimeout(() => {
+            setCurrentExerciseIndex(nextExIndex);
+            setCurrentSet(1);
+            setTimeLeft(workout.exercises[nextExIndex].duration);
+          }, 300);
+        } else {
+          playSound('end_workout');
+          setIsFinished(true);
+        }
+      }
+    }
+  }, [isPaused, timeLeft, isFinished, currentExerciseIndex, currentSet, workout.exercises, playSound]);
+
+
+  const handlePlayPause = () => {
     if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
       audioContextRef.current.resume();
     }
-    setIsPaused(!isPaused);
+
+    if (timeLeft <= 0 && !isFinished) {
+      const currentExercise = workout.exercises[currentExerciseIndex];
+      const totalSets = currentExercise.sets ?? 1;
+
+      // Only handle advancing to the next set.
+      // Advancing to the next exercise is handled by the useEffect above.
+      if (currentSet < totalSets) {
+        setCurrentSet(prev => prev + 1);
+        setTimeLeft(currentExercise.duration);
+        setIsPaused(false);
+      }
+      // If it's the last set, do nothing. The useEffect will change the view,
+      // and the user will press play again to start the new exercise timer.
+    } else {
+      // Regular pause/resume
+      setIsPaused(!isPaused);
+    }
   };
+
 
   const currentExercise = workout.exercises[currentExerciseIndex];
   const nextExercise = workout.exercises[currentExerciseIndex + 1];
-  const progress = ((currentExercise.duration - timeLeft) / currentExercise.duration) * 100;
+  const progress = timeLeft > 0 ? ((currentExercise.duration - timeLeft) / currentExercise.duration) * 100 : 100;
   
   if (isFinished) {
     return (
@@ -126,12 +163,18 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
         </p>
         <h2 className="text-4xl sm:text-5xl font-bold text-white my-2 break-words max-w-full">{currentExercise.name}</h2>
         
-        {(currentExercise.weight || currentExercise.reps) && (
-            <div className="flex items-center justify-center space-x-6 text-xl text-gray-300 mb-4">
-                {currentExercise.weight && <span>⚖️ {currentExercise.weight} kg</span>}
-                {currentExercise.reps && <span>🔄 {currentExercise.reps} 回</span>}
-            </div>
-        )}
+        <div className="mb-4 text-center">
+            <p className="text-2xl font-semibold text-cyan-300">
+                セット {currentSet} / {currentExercise.sets ?? 1}
+            </p>
+            
+            {(currentExercise.weight || currentExercise.reps) && (
+                <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 text-xl text-gray-300 mt-2">
+                    {currentExercise.weight && <span>⚖️ {currentExercise.weight} kg</span>}
+                    {currentExercise.reps && <span>🔄 {currentExercise.reps} 回</span>}
+                </div>
+            )}
+        </div>
 
         <div className="relative my-4 w-60 h-60 sm:w-64 sm:h-64 flex items-center justify-center">
             <svg className="absolute w-full h-full" viewBox="0 0 100 100">
@@ -150,7 +193,14 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
                     style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 1s linear' }}
                 />
             </svg>
-            <span className="text-6xl sm:text-7xl font-mono font-bold">{timeLeft}</span>
+             <div className="flex flex-col items-center">
+                <span className="text-6xl sm:text-7xl font-mono font-bold">{timeLeft}</span>
+                {timeLeft <= 0 && !isFinished && (
+                    <p className="text-cyan-400 font-semibold text-sm mt-1 animate-pulse">
+                        タップして次へ
+                    </p>
+                )}
+            </div>
         </div>
 
         <p className="text-gray-400 h-6">
@@ -160,7 +210,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
       
       <div className="flex items-center space-x-6 mt-4">
         <button
-          onClick={togglePause}
+          onClick={handlePlayPause}
           className="w-20 h-20 bg-cyan-500 rounded-full text-white flex items-center justify-center text-2xl font-bold hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 transition-colors"
           aria-label={isPaused ? "再生" : "一時停止"}
         >

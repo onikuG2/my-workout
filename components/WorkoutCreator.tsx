@@ -24,6 +24,7 @@ const allPresetNames = Object.values(presetExercises).flat();
 const durationPresets = Array.from({ length: 10 }, (_, i) => (i + 1) * 30); // 30...300
 const weightPresets = Array.from({ length: 20 }, (_, i) => (i + 1) * 5); // 5...100
 const repsPresets = Array.from({ length: 10 }, (_, i) => (i + 1) * 5); // 5...50
+const setsPresets = Array.from({ length: 10 }, (_, i) => i + 1); // 1...10
 
 const formatDurationForDisplay = (seconds: number): string => {
   if (seconds < 60) {
@@ -41,16 +42,16 @@ const formatDurationForDisplay = (seconds: number): string => {
 const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, workoutToEdit }) => {
   const [name, setName] = useState('');
   const [exercises, setExercises] = useState<Exercise[]>([
-    { id: `ex-${Date.now()}`, name: '', duration: 60, weight: undefined, reps: undefined },
+    { id: `ex-${Date.now()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined },
   ]);
   
   useEffect(() => {
     if (workoutToEdit) {
       setName(workoutToEdit.name);
-      setExercises(workoutToEdit.exercises);
+      setExercises(workoutToEdit.exercises.map(ex => ({...ex, sets: ex.sets ?? 3})));
     } else {
       setName('');
-      setExercises([{ id: `ex-${Date.now()}`, name: '', duration: 60, weight: undefined, reps: undefined }]);
+      setExercises([{ id: `ex-${Date.now()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined }]);
     }
   }, [workoutToEdit]);
 
@@ -66,7 +67,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             const numValue = parseInt(value, 10);
              if (field === 'duration') {
                 updatedEx.duration = isNaN(numValue) ? 0 : numValue;
-            } else { // weight or reps
+            } else { // weight, reps or sets
                 updatedEx[field] = isNaN(numValue) || value === '' ? undefined : numValue;
             }
           }
@@ -80,7 +81,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
   const addExercise = () => {
     setExercises([
       ...exercises,
-      { id: `ex-${Date.now()}-${Math.random()}`, name: '', duration: 60, weight: undefined, reps: undefined },
+      { id: `ex-${Date.now()}-${Math.random()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined },
     ]);
   };
 
@@ -98,7 +99,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       return;
     }
     if (exercises.some(ex => !ex.name.trim() || !ex.duration || ex.duration <= 0)) {
-      alert('すべてのエクササイズに名前と0より大きい時間を入力してください。');
+      alert('すべてのエクササイズに名前と0より大きいインターバルを入力してください。');
       return;
     }
     const workoutData: Workout = {
@@ -136,6 +137,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             const selectedDuration = durationPresets.includes(exercise.duration) ? String(exercise.duration) : '_custom_';
             const selectedWeight = exercise.weight !== undefined && weightPresets.includes(exercise.weight) ? String(exercise.weight) : '_custom_';
             const selectedReps = exercise.reps !== undefined && repsPresets.includes(exercise.reps) ? String(exercise.reps) : '_custom_';
+            const selectedSets = exercise.sets !== undefined && setsPresets.includes(exercise.sets) ? String(exercise.sets) : '_custom_';
             
             return (
               <div key={exercise.id} className="p-5 pr-12 bg-gray-700/50 rounded-lg space-y-3 relative">
@@ -170,7 +172,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
                         )}
                     </div>
                     <div>
-                        <label htmlFor={`ex-duration-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">時間</label>
+                        <label htmlFor={`ex-duration-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">インターバル</label>
                         <select
                             id={`ex-duration-select-${exercise.id}`}
                             value={selectedDuration}
@@ -233,6 +235,29 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
                                 value={exercise.reps ?? ''}
                                 onChange={(e) => handleExerciseChange(exercise.id, 'reps', e.target.value)}
                                 placeholder="例：12"
+                                min="0"
+                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <label htmlFor={`ex-sets-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">セット数（任意）</label>
+                         <select
+                            id={`ex-sets-select-${exercise.id}`}
+                            value={selectedSets}
+                            onChange={(e) => handleExerciseChange(exercise.id, 'sets', e.target.value === '_custom_' ? '' : e.target.value)}
+                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
+                        >
+                            <option value="_custom_">任意入力</option>
+                            {setsPresets.map(s => <option key={s} value={s}>{s} セット</option>)}
+                        </select>
+                        {selectedSets === '_custom_' && (
+                            <input
+                                type="number"
+                                id={`ex-sets-custom-${exercise.id}`}
+                                value={exercise.sets ?? ''}
+                                onChange={(e) => handleExerciseChange(exercise.id, 'sets', e.target.value)}
+                                placeholder="例：3"
                                 min="0"
                                 className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
                             />

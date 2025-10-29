@@ -6,6 +6,34 @@ import WorkoutPlayer from './components/WorkoutPlayer';
 
 type View = 'list' | 'create' | 'player';
 
+// --- Cookie Helper Functions ---
+function setCookie(name: string, value: string, days: number) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    const encodedValue = encodeURIComponent(value);
+    // Cookieのサイズ制限（約4KB）を超えそうな場合に警告
+    if (encodedValue.length > 4000) {
+        console.warn("Cookie size is approaching the 4KB limit. Data might not be saved correctly in the cookie.");
+    }
+    document.cookie = name + "=" + (encodedValue || "")  + expires + "; path=/; SameSite=Lax; Secure";
+}
+
+function getCookie(name: string): string | null {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+// --- End Cookie Helper Functions ---
+
 const App: React.FC = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [currentView, setCurrentView] = useState<View>('list');
@@ -14,21 +42,37 @@ const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      const savedWorkouts = localStorage.getItem('workouts');
-      if (savedWorkouts) {
-        setWorkouts(JSON.parse(savedWorkouts));
+      // 1. ローカルストレージから読み込みを試行
+      const savedWorkoutsLS = localStorage.getItem('workouts');
+      if (savedWorkoutsLS) {
+        setWorkouts(JSON.parse(savedWorkoutsLS));
+        return;
+      }
+
+      // 2. ローカルストレージにない場合、Cookieから読み込みを試行
+      const savedWorkoutsCookie = getCookie('workouts');
+      if (savedWorkoutsCookie) {
+        const parsedWorkouts = JSON.parse(savedWorkoutsCookie);
+        setWorkouts(parsedWorkouts);
+        // 安全のため、Cookieから読み込んだデータをローカルストレージにも保存しておく
+        localStorage.setItem('workouts', JSON.stringify(parsedWorkouts));
       }
     } catch (error) {
-      console.error("Failed to load workouts from localStorage", error);
+      console.error("Failed to load workouts from storage", error);
     }
   }, []);
 
   const saveWorkouts = useCallback((updatedWorkouts: Workout[]) => {
     try {
-      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      const workoutsString = JSON.stringify(updatedWorkouts);
+      // ローカルストレージに保存
+      localStorage.setItem('workouts', workoutsString);
+      // Cookieにも保存 (有効期限365日)
+      setCookie('workouts', workoutsString, 365);
+      
       setWorkouts(updatedWorkouts);
     } catch (error) {
-      console.error("Failed to save workouts to localStorage", error);
+      console.error("Failed to save workouts to storage", error);
     }
   }, []);
 
