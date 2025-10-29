@@ -15,7 +15,6 @@ function setCookie(name: string, value: string, days: number) {
         expires = "; expires=" + date.toUTCString();
     }
     const encodedValue = encodeURIComponent(value);
-    // Cookieのサイズ制限（約4KB）を超えそうな場合に警告
     if (encodedValue.length > 4000) {
         console.warn("Cookie size is approaching the 4KB limit. Data might not be saved correctly in the cookie.");
     }
@@ -42,19 +41,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      // 1. ローカルストレージから読み込みを試行
       const savedWorkoutsLS = localStorage.getItem('workouts');
       if (savedWorkoutsLS) {
         setWorkouts(JSON.parse(savedWorkoutsLS));
         return;
       }
-
-      // 2. ローカルストレージにない場合、Cookieから読み込みを試行
       const savedWorkoutsCookie = getCookie('workouts');
       if (savedWorkoutsCookie) {
         const parsedWorkouts = JSON.parse(savedWorkoutsCookie);
         setWorkouts(parsedWorkouts);
-        // 安全のため、Cookieから読み込んだデータをローカルストレージにも保存しておく
         localStorage.setItem('workouts', JSON.stringify(parsedWorkouts));
       }
     } catch (error) {
@@ -65,11 +60,8 @@ const App: React.FC = () => {
   const saveWorkouts = useCallback((updatedWorkouts: Workout[]) => {
     try {
       const workoutsString = JSON.stringify(updatedWorkouts);
-      // ローカルストレージに保存
       localStorage.setItem('workouts', workoutsString);
-      // Cookieにも保存 (有効期限365日)
       setCookie('workouts', workoutsString, 365);
-      
       setWorkouts(updatedWorkouts);
     } catch (error) {
       console.error("Failed to save workouts to storage", error);
@@ -133,6 +125,7 @@ const App: React.FC = () => {
       default:
         return <WorkoutList 
           workouts={workouts} 
+          setWorkouts={saveWorkouts}
           onCreate={handleCreateWorkout} 
           onStart={handleStartWorkout} 
           onDelete={handleDeleteWorkout}

@@ -6,16 +6,25 @@ import PlayIcon from './icons/PlayIcon';
 import ClockIcon from './icons/ClockIcon';
 import PencilIcon from './icons/PencilIcon';
 import ConfirmModal from './modals/ConfirmModal';
+import LocalFileSync from './LocalFileSync';
 
 interface WorkoutListProps {
   workouts: Workout[];
+  setWorkouts: (workouts: Workout[]) => void;
   onCreate: () => void;
   onStart: (workout: Workout) => void;
   onDelete: (workoutId: string) => void;
   onEdit: (workout: Workout) => void;
 }
 
-const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onCreate, onStart, onDelete, onEdit }) => {
+const WorkoutList: React.FC<WorkoutListProps> = ({ 
+  workouts, 
+  setWorkouts,
+  onCreate, 
+  onStart, 
+  onDelete, 
+  onEdit,
+}) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<Workout | null>(null);
 
@@ -33,7 +42,6 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onCreate, onStart, 
 
   const closeDeleteConfirmation = () => {
     setIsDeleteModalOpen(false);
-    // Add a small delay to allow the modal to animate out before clearing the data
     setTimeout(() => {
         setWorkoutToDelete(null);
     }, 300); 
@@ -45,7 +53,6 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onCreate, onStart, 
       closeDeleteConfirmation();
     }
   };
-
 
   return (
     <>
@@ -101,6 +108,13 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onCreate, onStart, 
               <PlusIcon className="w-6 h-6 mr-2" />
               新しいワークアウトを作成
           </button>
+
+          <div className="border-t border-gray-700 pt-4 mt-4">
+            <LocalFileSync
+                localWorkouts={workouts}
+                onWorkoutsLoaded={setWorkouts}
+            />
+          </div>
       </div>
 
       <ConfirmModal
