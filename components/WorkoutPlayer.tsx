@@ -7,7 +7,7 @@ import ChevronLeftIcon from './icons/ChevronLeftIcon';
 
 interface WorkoutPlayerProps {
   workout: Workout;
-  onFinish: () => void;
+  onFinish: (workout: Workout) => void;
 }
 
 const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
@@ -139,7 +139,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
         <h2 className="text-4xl font-bold text-green-400">ワークアウト完了！</h2>
         <p className="text-gray-300 mt-4">お疲れ様でした！{workout.name} ワークアウトが終了しました。</p>
         <button
-          onClick={onFinish}
+          onClick={() => onFinish(workout)}
           className="mt-8 py-2 px-6 bg-cyan-500 text-white font-semibold rounded-md hover:bg-cyan-600 transition-colors flex items-center"
         >
           <ChevronLeftIcon className="w-5 h-5 mr-2" />
@@ -152,7 +152,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
   return (
     <div className="flex flex-col items-center text-center p-4 h-[500px]">
       <div className="w-full text-left mb-4">
-        <button onClick={onFinish} className="text-cyan-400 hover:text-cyan-300 flex items-center text-sm">
+        <button onClick={() => onFinish(workout)} className="text-cyan-400 hover:text-cyan-300 flex items-center text-sm">
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> ワークアウト一覧に戻る
         </button>
       </div>
@@ -217,7 +217,7 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
           {isPaused ? <PlayIcon className="w-10 h-10 ml-1"/> : <PauseIcon className="w-10 h-10" />}
         </button>
         <button
-          onClick={onFinish}
+          onClick={() => onFinish(workout)}
           className="w-16 h-16 bg-red-600 rounded-full text-white flex items-center justify-center hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-colors"
           aria-label="ワークアウトを停止"
         >

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Workout } from './types';
+import { Workout, WorkoutHistoryEntry } from './types';
 import WorkoutList from './components/WorkoutList';
 import WorkoutCreator from './components/WorkoutCreator';
 import WorkoutPlayer from './components/WorkoutPlayer';
+import WorkoutHistory from './components/WorkoutHistory';
 
-type View = 'list' | 'create' | 'player';
+type View = 'list' | 'create' | 'player' | 'history';
 
 // --- Cookie Helper Functions ---
 function setCookie(name: string, value: string, days: number) {
@@ -35,6 +36,7 @@ function getCookie(name: string): string | null {
 
 const App: React.FC = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryEntry[]>([]);
   const [currentView, setCurrentView] = useState<View>('list');
   const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
   const [workoutToEdit, setWorkoutToEdit] = useState<Workout | null>(null);
@@ -44,16 +46,29 @@ const App: React.FC = () => {
       const savedWorkoutsLS = localStorage.getItem('workouts');
       if (savedWorkoutsLS) {
         setWorkouts(JSON.parse(savedWorkoutsLS));
-        return;
+      } else {
+        const savedWorkoutsCookie = getCookie('workouts');
+        if (savedWorkoutsCookie) {
+          const parsedWorkouts = JSON.parse(savedWorkoutsCookie);
+          setWorkouts(parsedWorkouts);
+          localStorage.setItem('workouts', JSON.stringify(parsedWorkouts));
+        }
       }
-      const savedWorkoutsCookie = getCookie('workouts');
-      if (savedWorkoutsCookie) {
-        const parsedWorkouts = JSON.parse(savedWorkoutsCookie);
-        setWorkouts(parsedWorkouts);
-        localStorage.setItem('workouts', JSON.stringify(parsedWorkouts));
+
+      const savedHistoryLS = localStorage.getItem('workoutHistory');
+      if(savedHistoryLS) {
+        setWorkoutHistory(JSON.parse(savedHistoryLS));
+      } else {
+        const savedHistoryCookie = getCookie('workoutHistory');
+        if (savedHistoryCookie) {
+          const parsedHistory = JSON.parse(savedHistoryCookie);
+          setWorkoutHistory(parsedHistory);
+          localStorage.setItem('workoutHistory', JSON.stringify(parsedHistory));
+        }
       }
+
     } catch (error) {
-      console.error("Failed to load workouts from storage", error);
+      console.error("Failed to load data from storage", error);
     }
   }, []);
 
@@ -65,6 +80,17 @@ const App: React.FC = () => {
       setWorkouts(updatedWorkouts);
     } catch (error) {
       console.error("Failed to save workouts to storage", error);
+    }
+  }, []);
+
+  const saveWorkoutHistory = useCallback((updatedHistory: WorkoutHistoryEntry[]) => {
+    try {
+      const historyString = JSON.stringify(updatedHistory);
+      localStorage.setItem('workoutHistory', historyString);
+      setCookie('workoutHistory', historyString, 365);
+      setWorkoutHistory(updatedHistory);
+    } catch (error) {
+      console.error("Failed to save workout history to storage", error);
     }
   }, []);
 
@@ -107,9 +133,26 @@ const App: React.FC = () => {
     setCurrentView('list');
   };
 
-  const handleFinishWorkout = () => {
+  const handleFinishWorkout = (completedWorkout: Workout) => {
+    const newHistoryEntry: WorkoutHistoryEntry = {
+      id: `hist-${Date.now()}`,
+      workoutName: completedWorkout.name,
+      completedAt: Date.now(),
+      totalDuration: completedWorkout.exercises.reduce((acc, ex) => acc + ex.duration, 0),
+    };
+    saveWorkoutHistory([...workoutHistory, newHistoryEntry]);
+    
     setActiveWorkout(null);
     setCurrentView('list');
+  };
+
+  const handleShowHistory = () => {
+    setCurrentView('history');
+  };
+
+  const handleDeleteHistoryEntry = (entryId: string) => {
+    const updatedHistory = workoutHistory.filter(entry => entry.id !== entryId);
+    saveWorkoutHistory(updatedHistory);
   };
 
   const renderContent = () => {
@@ -121,6 +164,12 @@ const App: React.FC = () => {
           return <WorkoutPlayer workout={activeWorkout} onFinish={handleFinishWorkout} />;
         }
         return null;
+      case 'history':
+        return <WorkoutHistory 
+          history={workoutHistory}
+          onDelete={handleDeleteHistoryEntry}
+          onBack={() => setCurrentView('list')}
+        />;
       case 'list':
       default:
         return <WorkoutList 
@@ -130,6 +179,7 @@ const App: React.FC = () => {
           onStart={handleStartWorkout} 
           onDelete={handleDeleteWorkout}
           onEdit={handleEditWorkout}
+          onShowHistory={handleShowHistory}
         />;
     }
   };

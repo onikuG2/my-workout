@@ -5,6 +5,7 @@ import TrashIcon from './icons/TrashIcon';
 import PlayIcon from './icons/PlayIcon';
 import ClockIcon from './icons/ClockIcon';
 import PencilIcon from './icons/PencilIcon';
+import HistoryIcon from './icons/HistoryIcon';
 import ConfirmModal from './modals/ConfirmModal';
 import LocalFileSync from './LocalFileSync';
 
@@ -15,6 +16,7 @@ interface WorkoutListProps {
   onStart: (workout: Workout) => void;
   onDelete: (workoutId: string) => void;
   onEdit: (workout: Workout) => void;
+  onShowHistory: () => void;
 }
 
 const WorkoutList: React.FC<WorkoutListProps> = ({ 
@@ -24,6 +26,7 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   onStart, 
   onDelete, 
   onEdit,
+  onShowHistory,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<Workout | null>(null);
@@ -57,6 +60,15 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   return (
     <>
       <div className="space-y-4">
+          <div className="flex justify-end">
+            <button
+              onClick={onShowHistory}
+              className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+            >
+              <HistoryIcon className="w-5 h-5 mr-2" />
+              ワークアウト履歴
+            </button>
+          </div>
           {workouts.length === 0 ? (
               <div className="text-center py-12 px-6 bg-gray-700/50 rounded-lg">
                   <h2 className="text-xl font-semibold text-gray-300">まだワークアウトがありません</h2>

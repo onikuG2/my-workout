@@ -12,3 +12,10 @@ export interface Workout {
   name: string;
   exercises: Exercise[];
 }
+
+export interface WorkoutHistoryEntry {
+  id: string;
+  workoutName: string;
+  completedAt: number; // timestamp
+  totalDuration: number; // in seconds
+}
