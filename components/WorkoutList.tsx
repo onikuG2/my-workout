@@ -6,7 +6,9 @@ import PlayIcon from './icons/PlayIcon';
 import ClockIcon from './icons/ClockIcon';
 import PencilIcon from './icons/PencilIcon';
 import HistoryIcon from './icons/HistoryIcon';
+import SparklesIcon from './icons/SparklesIcon';
 import ConfirmModal from './modals/ConfirmModal';
+import PresetWorkoutModal from './modals/PresetWorkoutModal';
 import LocalFileSync from './LocalFileSync';
 
 interface WorkoutListProps {
@@ -30,9 +32,13 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<Workout | null>(null);
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
 
   const getTotalDuration = (workout: Workout) => {
-    const totalSeconds = workout.exercises.reduce((acc, ex) => acc + ex.duration, 0);
+    const totalSeconds = workout.exercises.reduce((acc, ex) => {
+      const sets = ex.sets || 1;
+      return acc + ((ex.duration || 0) + (ex.restDuration || 0)) * sets;
+    }, 0);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}m ${seconds}s`;
@@ -55,6 +61,25 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
       onDelete(workoutToDelete.id);
       closeDeleteConfirmation();
     }
+  };
+
+  const handleAddPresets = (presets: Workout[]) => {
+    const newWorkouts = presets.map(workout => {
+      const newWorkoutId = `wo-${Date.now()}-${Math.random()}`;
+      const newExercises = workout.exercises.map(ex => ({
+        ...ex,
+        id: `ex-${Date.now()}-${Math.random()}`
+      }));
+      return {
+        ...workout,
+        id: newWorkoutId,
+        exercises: newExercises
+      };
+    });
+
+    const updatedWorkouts = [...workouts, ...newWorkouts];
+    setWorkouts(updatedWorkouts);
+    setIsPresetModalOpen(false);
   };
 
   return (
@@ -120,8 +145,16 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
               <PlusIcon className="w-6 h-6 mr-2" />
               新しいワークアウトを作成
           </button>
+          
+          <div className="border-t border-gray-700 pt-4 mt-4 space-y-4">
+              <button
+                onClick={() => setIsPresetModalOpen(true)}
+                className="w-full flex items-center justify-center py-2 px-4 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors"
+              >
+                  <SparklesIcon className="w-5 h-5 mr-2" />
+                  おすすめワークアウトを追加
+              </button>
 
-          <div className="border-t border-gray-700 pt-4 mt-4">
             <LocalFileSync
                 localWorkouts={workouts}
                 onWorkoutsLoaded={setWorkouts}
@@ -136,6 +169,12 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
           title="ワークアウトの削除"
           message={workoutToDelete ? `「${workoutToDelete.name}」を本当に削除しますか？この操作は元に戻せません。` : ''}
         />
+      
+      <PresetWorkoutModal 
+        isOpen={isPresetModalOpen}
+        onClose={() => setIsPresetModalOpen(false)}
+        onAdd={handleAddPresets}
+      />
     </>
   );
 };

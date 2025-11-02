@@ -21,12 +21,16 @@ const presetExercises = {
 
 const allPresetNames = Object.values(presetExercises).flat();
 
-const durationPresets = Array.from({ length: 10 }, (_, i) => (i + 1) * 30); // 30...300
+const durationPresets = [0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300]; // 0s to 5min
+const restPresets = [0, 15, 30, 45, 60, 90, 120, 180]; // 0s to 3min
 const weightPresets = Array.from({ length: 20 }, (_, i) => (i + 1) * 5); // 5...100
 const repsPresets = Array.from({ length: 10 }, (_, i) => (i + 1) * 5); // 5...50
 const setsPresets = Array.from({ length: 10 }, (_, i) => i + 1); // 1...10
 
 const formatDurationForDisplay = (seconds: number): string => {
+  if (seconds === 0) {
+    return '0 秒 (回数ベース)';
+  }
   if (seconds < 60) {
     return `${seconds} 秒`;
   }
@@ -42,16 +46,16 @@ const formatDurationForDisplay = (seconds: number): string => {
 const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, workoutToEdit }) => {
   const [name, setName] = useState('');
   const [exercises, setExercises] = useState<Exercise[]>([
-    { id: `ex-${Date.now()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined },
+    { id: `ex-${Date.now()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined },
   ]);
   
   useEffect(() => {
     if (workoutToEdit) {
       setName(workoutToEdit.name);
-      setExercises(workoutToEdit.exercises.map(ex => ({...ex, sets: ex.sets ?? 3})));
+      setExercises(workoutToEdit.exercises.map(ex => ({...ex, sets: ex.sets ?? 3, restDuration: ex.restDuration ?? 30})));
     } else {
       setName('');
-      setExercises([{ id: `ex-${Date.now()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined }]);
+      setExercises([{ id: `ex-${Date.now()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined }]);
     }
   }, [workoutToEdit]);
 
@@ -65,8 +69,8 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             updatedEx.name = value;
           } else {
             const numValue = parseInt(value, 10);
-             if (field === 'duration') {
-                updatedEx.duration = isNaN(numValue) ? 0 : numValue;
+            if (field === 'duration' || field === 'restDuration') {
+                updatedEx[field] = isNaN(numValue) ? 0 : numValue;
             } else { // weight, reps or sets
                 updatedEx[field] = isNaN(numValue) || value === '' ? undefined : numValue;
             }
@@ -81,7 +85,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
   const addExercise = () => {
     setExercises([
       ...exercises,
-      { id: `ex-${Date.now()}-${Math.random()}`, name: '', duration: 60, sets: 3, weight: undefined, reps: undefined },
+      { id: `ex-${Date.now()}-${Math.random()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined },
     ]);
   };
 
@@ -98,8 +102,12 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       alert('ワークアウト名を入力してください。');
       return;
     }
-    if (exercises.some(ex => !ex.name.trim() || !ex.duration || ex.duration <= 0)) {
-      alert('すべてのエクササイズに名前と0より大きいインターバルを入力してください。');
+    if (exercises.some(ex => !ex.name.trim())) {
+      alert('すべてのエクササイズに名前を入力してください。');
+      return;
+    }
+    if (exercises.some(ex => ex.duration < 0 || (ex.restDuration && ex.restDuration < 0))) {
+      alert('ワークタイムとインターバルには0以上の値を入力してください。');
       return;
     }
     const workoutData: Workout = {
@@ -135,6 +143,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
         {exercises.map((exercise) => {
             const selectedName = allPresetNames.includes(exercise.name) ? exercise.name : '_custom_';
             const selectedDuration = durationPresets.includes(exercise.duration) ? String(exercise.duration) : '_custom_';
+            const selectedRest = exercise.restDuration !== undefined && restPresets.includes(exercise.restDuration) ? String(exercise.restDuration) : '_custom_';
             const selectedWeight = exercise.weight !== undefined && weightPresets.includes(exercise.weight) ? String(exercise.weight) : '_custom_';
             const selectedReps = exercise.reps !== undefined && repsPresets.includes(exercise.reps) ? String(exercise.reps) : '_custom_';
             const selectedSets = exercise.sets !== undefined && setsPresets.includes(exercise.sets) ? String(exercise.sets) : '_custom_';
@@ -142,7 +151,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             return (
               <div key={exercise.id} className="p-5 pr-12 bg-gray-700/50 rounded-lg space-y-3 relative">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                    <div className="sm:col-span-2">
                         <label htmlFor={`ex-preset-${exercise.id}`} className="block text-xs font-medium text-gray-400">エクササイズ名</label>
                         <select
                             id={`ex-preset-${exercise.id}`}
@@ -172,7 +181,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
                         )}
                     </div>
                     <div>
-                        <label htmlFor={`ex-duration-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">インターバル</label>
+                        <label htmlFor={`ex-duration-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">ワークタイム</label>
                         <select
                             id={`ex-duration-select-${exercise.id}`}
                             value={selectedDuration}
@@ -189,7 +198,30 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
                                 value={exercise.duration || ''}
                                 onChange={(e) => handleExerciseChange(exercise.id, 'duration', e.target.value)}
                                 placeholder="秒数を入力 (例: 45)"
-                                min="1"
+                                min="0"
+                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <label htmlFor={`ex-rest-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">インターバル（休憩）</label>
+                        <select
+                            id={`ex-rest-select-${exercise.id}`}
+                            value={selectedRest}
+                            onChange={(e) => handleExerciseChange(exercise.id, 'restDuration', e.target.value === '_custom_' ? '' : e.target.value)}
+                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
+                        >
+                            <option value="_custom_">任意入力</option>
+                            {restPresets.map(d => <option key={d} value={d}>{formatDurationForDisplay(d).replace(' (回数ベース)','')}</option>)}
+                        </select>
+                        {selectedRest === '_custom_' && (
+                            <input
+                                type="number"
+                                id={`ex-rest-custom-${exercise.id}`}
+                                value={exercise.restDuration ?? ''}
+                                onChange={(e) => handleExerciseChange(exercise.id, 'restDuration', e.target.value)}
+                                placeholder="秒数を入力 (例: 30)"
+                                min="0"
                                 className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
                             />
                         )}

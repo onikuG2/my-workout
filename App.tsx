@@ -138,7 +138,7 @@ const App: React.FC = () => {
       id: `hist-${Date.now()}`,
       workoutName: completedWorkout.name,
       completedAt: Date.now(),
-      totalDuration: completedWorkout.exercises.reduce((acc, ex) => acc + ex.duration, 0),
+      totalDuration: completedWorkout.exercises.reduce((acc, ex) => acc + ((ex.duration || 0) + (ex.restDuration || 0)) * (ex.sets || 1), 0),
     };
     saveWorkoutHistory([...workoutHistory, newHistoryEntry]);
     
