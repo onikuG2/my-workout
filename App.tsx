@@ -4,6 +4,7 @@ import WorkoutList from './components/WorkoutList';
 import WorkoutCreator from './components/WorkoutCreator';
 import WorkoutPlayer from './components/WorkoutPlayer';
 import WorkoutHistory from './components/WorkoutHistory';
+import ErrorBoundary from './components/ErrorBoundary';
 
 type View = 'list' | 'create' | 'player' | 'history';
 
@@ -40,9 +41,11 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('list');
   const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
   const [workoutToEdit, setWorkoutToEdit] = useState<Workout | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
+      setLoadError(null);
       const savedWorkoutsLS = localStorage.getItem('workouts');
       if (savedWorkoutsLS) {
         setWorkouts(JSON.parse(savedWorkoutsLS));
@@ -69,6 +72,7 @@ const App: React.FC = () => {
 
     } catch (error) {
       console.error("Failed to load data from storage", error);
+      setLoadError("データの読み込みに失敗しました。保存されたデータが破損している可能性があります。");
     }
   }, []);
 
@@ -192,7 +196,16 @@ const App: React.FC = () => {
           <p className="text-gray-400 mt-2">カスタムワークアウトを作成、保存、実行します。</p>
         </header>
         <main className="bg-gray-800 rounded-xl shadow-2xl p-4 sm:p-6 transition-all duration-300">
-          {renderContent()}
+          {loadError ? (
+            <div className="bg-red-900/50 border border-red-500 text-red-300 p-4 rounded-lg text-center">
+              <p className="font-semibold">エラー</p>
+              <p>{loadError}</p>
+            </div>
+          ) : (
+            <ErrorBoundary>
+              {renderContent()}
+            </ErrorBoundary>
+          )}
         </main>
       </div>
     </div>

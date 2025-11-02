@@ -154,11 +154,13 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
                   <SparklesIcon className="w-5 h-5 mr-2" />
                   おすすめワークアウトを追加
               </button>
-
-            <LocalFileSync
-                localWorkouts={workouts}
-                onWorkoutsLoaded={setWorkouts}
-            />
+          </div>
+          
+          <div className="border-t border-gray-700 pt-4 mt-4">
+            <h3 className="text-sm font-semibold text-gray-400 mb-3 text-center uppercase tracking-wider">
+              データ管理
+            </h3>
+            <LocalFileSync localWorkouts={workouts} onWorkoutsLoaded={setWorkouts} />
           </div>
       </div>
 

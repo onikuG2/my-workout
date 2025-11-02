@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Workout, Exercise } from '../types';
 import TrashIcon from './icons/TrashIcon';
 import PlusIcon from './icons/PlusIcon';
+import { useAlert } from './AlertProvider';
 
 interface WorkoutCreatorProps {
   onSave: (workout: Workout) => void;
@@ -23,299 +25,184 @@ const allPresetNames = Object.values(presetExercises).flat();
 
 const durationPresets = [0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300]; // 0s to 5min
 const restPresets = [0, 15, 30, 45, 60, 90, 120, 180]; // 0s to 3min
-const weightPresets = Array.from({ length: 20 }, (_, i) => (i + 1) * 5); // 5...100
-const repsPresets = Array.from({ length: 10 }, (_, i) => (i + 1) * 5); // 5...50
-const setsPresets = Array.from({ length: 10 }, (_, i) => i + 1); // 1...10
-
-const formatDurationForDisplay = (seconds: number): string => {
-  if (seconds === 0) {
-    return '0 秒 (回数ベース)';
-  }
-  if (seconds < 60) {
-    return `${seconds} 秒`;
-  }
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  if (remainingSeconds === 0) {
-    return `${minutes} 分`;
-  }
-  return `${minutes} 分 ${remainingSeconds} 秒`;
-};
-
+const weightPresets = [0, ...Array.from({ length: 40 }, (_, i) => (i + 1) * 2.5)]; // 0kg to 100kg
+const setsPresets = Array.from({ length: 10 }, (_, i) => i + 1); // 1 to 10
+const repsPresets = [0, ...Array.from({ length: 19 }, (_, i) => i + 2), 25, 30, 50]; // 0, 2-20, 25, 30, 50
 
 const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, workoutToEdit }) => {
-  const [name, setName] = useState('');
-  const [exercises, setExercises] = useState<Exercise[]>([
-    { id: `ex-${Date.now()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined },
-  ]);
-  
+  const [workout, setWorkout] = useState<Workout>({
+      id: `wo-${Date.now()}`,
+      name: '',
+      exercises: [],
+    });
+  const { showAlert } = useAlert();
+
   useEffect(() => {
     if (workoutToEdit) {
-      setName(workoutToEdit.name);
-      setExercises(workoutToEdit.exercises.map(ex => ({...ex, sets: ex.sets ?? 3, restDuration: ex.restDuration ?? 30})));
+      setWorkout(workoutToEdit);
     } else {
-      setName('');
-      setExercises([{ id: `ex-${Date.now()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined }]);
+      // Set a default empty state for new workouts
+      setWorkout({
+        id: `wo-${Date.now()}`,
+        name: '',
+        exercises: [],
+      });
     }
   }, [workoutToEdit]);
 
-
-  const handleExerciseChange = (id: string, field: keyof Omit<Exercise, 'id'>, value: string) => {
-    setExercises(prevExercises =>
-      prevExercises.map(ex => {
-        if (ex.id === id) {
-          const updatedEx = { ...ex };
-          if (field === 'name') {
-            updatedEx.name = value;
-          } else {
-            const numValue = parseInt(value, 10);
-            if (field === 'duration' || field === 'restDuration') {
-                updatedEx[field] = isNaN(numValue) ? 0 : numValue;
-            } else { // weight, reps or sets
-                updatedEx[field] = isNaN(numValue) || value === '' ? undefined : numValue;
-            }
-          }
-          return updatedEx;
-        }
-        return ex;
-      })
-    );
+  const handleWorkoutNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWorkout({ ...workout, name: e.target.value });
   };
+
+  const handleExerciseChange = (index: number, field: keyof Exercise, value: string | number) => {
+    const newExercises = [...workout.exercises];
+    const exercise = { ...newExercises[index] };
+
+    // Update the field with either string (for name) or number
+    (exercise as any)[field] = (field === 'name') ? value : Number(value);
+    
+    newExercises[index] = exercise;
+    setWorkout({ ...workout, exercises: newExercises });
+  };
+
 
   const addExercise = () => {
-    setExercises([
-      ...exercises,
-      { id: `ex-${Date.now()}-${Math.random()}`, name: '', duration: 60, restDuration: 30, sets: 3, weight: undefined, reps: undefined },
-    ]);
+    const newExercise: Exercise = {
+      id: `ex-${Date.now()}-${Math.random()}`,
+      name: '',
+      duration: 30,
+      restDuration: 15,
+      sets: 3,
+      reps: 0, // Default to time-based
+      weight: 0,
+    };
+    setWorkout({
+      ...workout,
+      exercises: [...workout.exercises, newExercise],
+    });
   };
 
-  const removeExercise = (id: string) => {
-    if (exercises.length > 1) {
-      setExercises(exercises.filter(ex => ex.id !== id));
-    } else {
-      alert('ワークアウトには少なくとも1つのエクササイズが必要です。');
-    }
+  const removeExercise = (index: number) => {
+    const newExercises = workout.exercises.filter((_, i) => i !== index);
+    setWorkout({ ...workout, exercises: newExercises });
   };
 
   const handleSave = () => {
-    if (!name.trim()) {
-      alert('ワークアウト名を入力してください。');
+    if (!workout.name.trim()) {
+      showAlert('ワークアウト名を入力してください。', '入力エラー');
       return;
     }
-    if (exercises.some(ex => !ex.name.trim())) {
-      alert('すべてのエクササイズに名前を入力してください。');
+    if (workout.exercises.length === 0) {
+      showAlert('少なくとも1つのエクササイズを追加してください。', '入力エラー');
       return;
     }
-    if (exercises.some(ex => ex.duration < 0 || (ex.restDuration && ex.restDuration < 0))) {
-      alert('ワークタイムとインターバルには0以上の値を入力してください。');
-      return;
+    for (const ex of workout.exercises) {
+      if (!ex.name.trim()) {
+        showAlert('すべてのエクササイズに名前を入力してください。', '入力エラー');
+        return;
+      }
+       if ((!ex.duration || ex.duration <= 0) && (!ex.reps || ex.reps <= 0)) {
+        showAlert(`「${ex.name}」には時間または回数のいずれかを0より大きい値に設定してください。`, '入力エラー');
+        return;
+      }
     }
-    const workoutData: Workout = {
-      id: workoutToEdit ? workoutToEdit.id : `wo-${Date.now()}`,
-      name,
-      exercises,
-    };
-    onSave(workoutData);
+    onSave(workout);
   };
+  
+  const InputField = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div className="flex flex-col">
+        <label className="text-sm font-medium text-gray-400 mb-1">{label}</label>
+        {children}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center text-cyan-400">
-        {workoutToEdit ? 'ワークアウトを編集' : '新しいワークアウトを作成'}
-      </h2>
-
       <div>
-        <label htmlFor="workout-name" className="block text-sm font-medium text-gray-300 mb-1">
-          ワークアウト名
-        </label>
+        <h2 className="text-2xl font-bold text-cyan-400 mb-4">
+          {workoutToEdit ? 'ワークアウトの編集' : '新しいワークアウトの作成'}
+        </h2>
         <input
           type="text"
-          id="workout-name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="例：全身トレーニング"
-          className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:ring-cyan-500 focus:border-cyan-500"
+          value={workout.name}
+          onChange={handleWorkoutNameChange}
+          placeholder="ワークアウト名 (例: 全身HIIT)"
+          className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
         />
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-200">エクササイズ</h3>
-        {exercises.map((exercise) => {
-            const selectedName = allPresetNames.includes(exercise.name) ? exercise.name : '_custom_';
-            const selectedDuration = durationPresets.includes(exercise.duration) ? String(exercise.duration) : '_custom_';
-            const selectedRest = exercise.restDuration !== undefined && restPresets.includes(exercise.restDuration) ? String(exercise.restDuration) : '_custom_';
-            const selectedWeight = exercise.weight !== undefined && weightPresets.includes(exercise.weight) ? String(exercise.weight) : '_custom_';
-            const selectedReps = exercise.reps !== undefined && repsPresets.includes(exercise.reps) ? String(exercise.reps) : '_custom_';
-            const selectedSets = exercise.sets !== undefined && setsPresets.includes(exercise.sets) ? String(exercise.sets) : '_custom_';
-            
-            return (
-              <div key={exercise.id} className="p-5 pr-12 bg-gray-700/50 rounded-lg space-y-3 relative">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2">
-                        <label htmlFor={`ex-preset-${exercise.id}`} className="block text-xs font-medium text-gray-400">エクササイズ名</label>
-                        <select
-                            id={`ex-preset-${exercise.id}`}
-                            value={selectedName}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                handleExerciseChange(exercise.id, 'name', value === '_custom_' ? '' : value);
-                            }}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">その他（自由入力）</option>
-                            {Object.entries(presetExercises).map(([group, list]) => (
-                                <optgroup label={group} key={group}>
-                                    {list.map(exName => <option key={exName} value={exName}>{exName}</option>)}
-                                </optgroup>
-                            ))}
-                        </select>
-                        {selectedName === '_custom_' && (
-                             <input
-                                type="text"
-                                id={`ex-name-${exercise.id}`}
-                                value={exercise.name}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'name', e.target.value)}
-                                placeholder="カスタムエクササイズ名"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                    <div>
-                        <label htmlFor={`ex-duration-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">ワークタイム</label>
-                        <select
-                            id={`ex-duration-select-${exercise.id}`}
-                            value={selectedDuration}
-                            onChange={(e) => handleExerciseChange(exercise.id, 'duration', e.target.value === '_custom_' ? '' : e.target.value)}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">任意入力</option>
-                            {durationPresets.map(d => <option key={d} value={d}>{formatDurationForDisplay(d)}</option>)}
-                        </select>
-                        {selectedDuration === '_custom_' && (
-                            <input
-                                type="number"
-                                id={`ex-duration-custom-${exercise.id}`}
-                                value={exercise.duration || ''}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'duration', e.target.value)}
-                                placeholder="秒数を入力 (例: 45)"
-                                min="0"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                    <div>
-                        <label htmlFor={`ex-rest-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">インターバル（休憩）</label>
-                        <select
-                            id={`ex-rest-select-${exercise.id}`}
-                            value={selectedRest}
-                            onChange={(e) => handleExerciseChange(exercise.id, 'restDuration', e.target.value === '_custom_' ? '' : e.target.value)}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">任意入力</option>
-                            {restPresets.map(d => <option key={d} value={d}>{formatDurationForDisplay(d).replace(' (回数ベース)','')}</option>)}
-                        </select>
-                        {selectedRest === '_custom_' && (
-                            <input
-                                type="number"
-                                id={`ex-rest-custom-${exercise.id}`}
-                                value={exercise.restDuration ?? ''}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'restDuration', e.target.value)}
-                                placeholder="秒数を入力 (例: 30)"
-                                min="0"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                     <div>
-                        <label htmlFor={`ex-weight-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">重量（kg、任意）</label>
-                        <select
-                            id={`ex-weight-select-${exercise.id}`}
-                            value={selectedWeight}
-                            onChange={(e) => handleExerciseChange(exercise.id, 'weight', e.target.value === '_custom_' ? '' : e.target.value)}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">任意入力</option>
-                            {weightPresets.map(w => <option key={w} value={w}>{w} kg</option>)}
-                        </select>
-                        {selectedWeight === '_custom_' && (
-                             <input
-                                type="number"
-                                id={`ex-weight-custom-${exercise.id}`}
-                                value={exercise.weight ?? ''}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'weight', e.target.value)}
-                                placeholder="例：20"
-                                min="0"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                     <div>
-                        <label htmlFor={`ex-reps-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">回数（任意）</label>
-                         <select
-                            id={`ex-reps-select-${exercise.id}`}
-                            value={selectedReps}
-                            onChange={(e) => handleExerciseChange(exercise.id, 'reps', e.target.value === '_custom_' ? '' : e.target.value)}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">任意入力</option>
-                            {repsPresets.map(r => <option key={r} value={r}>{r} 回</option>)}
-                        </select>
-                        {selectedReps === '_custom_' && (
-                            <input
-                                type="number"
-                                id={`ex-reps-custom-${exercise.id}`}
-                                value={exercise.reps ?? ''}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'reps', e.target.value)}
-                                placeholder="例：12"
-                                min="0"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                    <div>
-                        <label htmlFor={`ex-sets-select-${exercise.id}`} className="block text-xs font-medium text-gray-400">セット数（任意）</label>
-                         <select
-                            id={`ex-sets-select-${exercise.id}`}
-                            value={selectedSets}
-                            onChange={(e) => handleExerciseChange(exercise.id, 'sets', e.target.value === '_custom_' ? '' : e.target.value)}
-                            className="w-full mt-1 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                        >
-                            <option value="_custom_">任意入力</option>
-                            {setsPresets.map(s => <option key={s} value={s}>{s} セット</option>)}
-                        </select>
-                        {selectedSets === '_custom_' && (
-                            <input
-                                type="number"
-                                id={`ex-sets-custom-${exercise.id}`}
-                                value={exercise.sets ?? ''}
-                                onChange={(e) => handleExerciseChange(exercise.id, 'sets', e.target.value)}
-                                placeholder="例：3"
-                                min="0"
-                                className="w-full mt-2 bg-gray-600 border-gray-500 rounded-md py-2 px-3 text-sm focus:ring-cyan-500 focus:border-cyan-500"
-                            />
-                        )}
-                    </div>
-                </div>
-                <button
-                  onClick={() => removeExercise(exercise.id)}
-                  className="absolute top-3 right-3 p-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-600 transition-colors"
-                  aria-label="エクササイズを削除"
-                >
-                  <TrashIcon className="w-5 h-5" />
-                </button>
+        {workout.exercises.map((exercise, index) => (
+          <div key={exercise.id} className="bg-gray-700/50 p-4 rounded-lg space-y-4 border border-gray-600">
+            <div className="flex justify-between items-start">
+              <div className="flex-grow">
+                <label className="text-sm font-medium text-gray-400 mb-1 block">エクササイズ名</label>
+                <input
+                    type="text"
+                    list="exercise-presets"
+                    value={exercise.name}
+                    onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+                    placeholder="例: スクワット"
+                    className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                />
+                 <datalist id="exercise-presets">
+                    {allPresetNames.map(name => <option key={name} value={name} />)}
+                </datalist>
               </div>
-            );
-        })}
-        <button
-          onClick={addExercise}
-          className="w-full flex items-center justify-center py-2 px-4 border-2 border-dashed border-gray-600 text-gray-400 rounded-md hover:border-cyan-500 hover:text-cyan-500 transition-colors"
-        >
-          <PlusIcon className="w-5 h-5 mr-2" />
-          エクササイズを追加
-        </button>
+              <button
+                onClick={() => removeExercise(index)}
+                className="ml-4 mt-6 p-2 text-gray-400 hover:text-white hover:bg-red-500 rounded-full transition-colors"
+                aria-label="エクササイズを削除"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+               <InputField label="時間 (秒)">
+                 <select value={exercise.duration || 0} onChange={e => handleExerciseChange(index, 'duration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                    {durationPresets.map(d => <option key={`dur-${d}`} value={d}>{d}s</option>)}
+                 </select>
+               </InputField>
+               <InputField label="回数">
+                  <select value={exercise.reps || 0} onChange={e => handleExerciseChange(index, 'reps', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                    {repsPresets.map(r => <option key={`rep-${r}`} value={r}>{r}回</option>)}
+                 </select>
+               </InputField>
+               <InputField label="休憩 (秒)">
+                 <select value={exercise.restDuration || 0} onChange={e => handleExerciseChange(index, 'restDuration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                    {restPresets.map(r => <option key={`rest-${r}`} value={r}>{r}s</option>)}
+                 </select>
+               </InputField>
+               <InputField label="セット数">
+                 <select value={exercise.sets || 1} onChange={e => handleExerciseChange(index, 'sets', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                    {setsPresets.map(s => <option key={`set-${s}`} value={s}>{s}セット</option>)}
+                 </select>
+               </InputField>
+               <InputField label="重量 (kg)">
+                 <select value={exercise.weight || 0} onChange={e => handleExerciseChange(index, 'weight', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                    {weightPresets.map(w => <option key={`w-${w}`} value={w}>{w}kg</option>)}
+                 </select>
+               </InputField>
+            </div>
+            
+             <p className="text-xs text-gray-500 text-center col-span-2 md:col-span-3">
+                時間を0に設定すると回数ベースのトレーニングになります。
+             </p>
+
+          </div>
+        ))}
       </div>
-      
-      <div className="flex justify-end space-x-4 pt-4">
+
+      <button
+        onClick={addExercise}
+        className="w-full flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors"
+      >
+        <PlusIcon className="w-5 h-5 mr-2" />
+        エクササイズを追加
+      </button>
+
+      <div className="flex justify-end space-x-4 pt-4 border-t border-gray-700">
         <button
           onClick={onCancel}
           className="py-2 px-6 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors"
@@ -326,7 +213,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
           onClick={handleSave}
           className="py-2 px-6 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition-colors"
         >
-          ワークアウトを保存
+          {workoutToEdit ? '更新' : '保存'}
         </button>
       </div>
     </div>
