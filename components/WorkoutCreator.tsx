@@ -22,6 +22,16 @@ const presetExercises = {
 };
 
 const allPresetNames = Object.values(presetExercises).flat();
+const bodyPartOptions = Object.keys(presetExercises);
+
+const findBodyPartByExercise = (exerciseName: string): string => {
+  for (const part of bodyPartOptions) {
+    if (presetExercises[part as keyof typeof presetExercises].includes(exerciseName)) {
+      return part;
+    }
+  }
+  return '全身';
+};
 
 const durationPresets = [0, 15, 30, 45, 60, 90, 120, 150, 180, 240, 300]; // 0s to 5min
 const restPresets = [0, 15, 30, 45, 60, 90, 120, 180]; // 0s to 3min
@@ -36,10 +46,14 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       exercises: [],
     });
   const { showAlert } = useAlert();
+  const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
 
   useEffect(() => {
     if (workoutToEdit) {
       setWorkout(workoutToEdit);
+      // 初期表示時に各エクササイズから部位を推定
+      const initialBodyParts = (workoutToEdit.exercises || []).map(ex => findBodyPartByExercise(ex.name || ''));
+      setSelectedBodyParts(initialBodyParts);
     } else {
       // Set a default empty state for new workouts
       setWorkout({
@@ -47,6 +61,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
         name: '',
         exercises: [],
       });
+      setSelectedBodyParts([]);
     }
   }, [workoutToEdit]);
 
@@ -80,11 +95,27 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       ...workout,
       exercises: [...workout.exercises, newExercise],
     });
+    setSelectedBodyParts(prev => [...prev, '全身']);
   };
 
   const removeExercise = (index: number) => {
     const newExercises = workout.exercises.filter((_, i) => i !== index);
     setWorkout({ ...workout, exercises: newExercises });
+    setSelectedBodyParts(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleBodyPartChange = (index: number, newPart: string) => {
+    setSelectedBodyParts(prev => {
+      const next = [...prev];
+      next[index] = newPart;
+      return next;
+    });
+    // 部位変更時、現在の種目がその部位に存在しなければ種目名をリセット
+    const validNames = presetExercises[newPart as keyof typeof presetExercises] || [];
+    const currentName = workout.exercises[index]?.name || '';
+    if (!validNames.includes(currentName)) {
+      handleExerciseChange(index, 'name', '');
+    }
   };
 
   const handleSave = () => {
@@ -135,19 +166,32 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
         {workout.exercises.map((exercise, index) => (
           <div key={exercise.id} className="bg-gray-700/50 p-4 rounded-lg space-y-4 border border-gray-600">
             <div className="flex justify-between items-start">
-              <div className="flex-grow">
-                <label className="text-sm font-medium text-gray-400 mb-1 block">エクササイズ名</label>
-                <input
-                    type="text"
-                    list="exercise-presets"
+              <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-400 mb-1">部位</label>
+                  <select
+                    value={selectedBodyParts[index] ?? findBodyPartByExercise(exercise.name || '')}
+                    onChange={(e) => handleBodyPartChange(index, e.target.value)}
+                    className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition w-full"
+                  >
+                    {bodyPartOptions.map(part => (
+                      <option key={part} value={part}>{part}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-400 mb-1">種目</label>
+                  <select
                     value={exercise.name}
                     onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
-                    placeholder="例: スクワット"
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
-                />
-                 <datalist id="exercise-presets">
-                    {allPresetNames.map(name => <option key={name} value={name} />)}
-                </datalist>
+                    className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition w-full"
+                  >
+                    <option value="">選択してください</option>
+                    {(presetExercises[(selectedBodyParts[index] ?? findBodyPartByExercise(exercise.name || '')) as keyof typeof presetExercises] || []).map(name => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <button
                 onClick={() => removeExercise(index)}
