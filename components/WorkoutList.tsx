@@ -11,6 +11,8 @@ import ConfirmModal from './modals/ConfirmModal';
 import PresetWorkoutModal from './modals/PresetWorkoutModal';
 import LocalFileSync from './LocalFileSync';
 
+import { PresetExercises } from '../data/presets';
+
 interface WorkoutListProps {
   workouts: Workout[];
   setWorkouts: (workouts: Workout[]) => void;
@@ -20,6 +22,7 @@ interface WorkoutListProps {
   onEdit: (workout: Workout) => void;
   onShowHistory: () => void;
   onOpenMaster: () => void;
+  onPresetsLoaded?: (presets: PresetExercises) => void;
 }
 
 const WorkoutList: React.FC<WorkoutListProps> = ({ 
@@ -31,6 +34,7 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   onEdit,
   onShowHistory,
   onOpenMaster,
+  onPresetsLoaded,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<Workout | null>(null);
@@ -168,7 +172,7 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
             <h3 className="text-sm font-semibold text-gray-400 mb-3 text-center uppercase tracking-wider">
               データ管理
             </h3>
-            <LocalFileSync localWorkouts={workouts} onWorkoutsLoaded={setWorkouts} />
+            <LocalFileSync localWorkouts={workouts} onWorkoutsLoaded={setWorkouts} onPresetsLoaded={onPresetsLoaded} />
           </div>
       </div>
 

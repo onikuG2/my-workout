@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { WorkoutHistoryEntry } from '../types';
 import TrashIcon from './icons/TrashIcon';
 import ClockIcon from './icons/ClockIcon';
 import ChevronLeftIcon from './icons/ChevronLeftIcon';
+import TwitterIcon from './icons/TwitterIcon';
 import ConfirmModal from './modals/ConfirmModal';
+import { tweetHistoryEntry } from '../utils/twitter';
+import WorkoutImageCard from './WorkoutImageCard';
+import { generateWorkoutImage, copyImageToClipboard, tweetWithImage } from '../utils/workoutImage';
+import { useAlert } from './AlertProvider';
 
 interface WorkoutHistoryProps {
   history: WorkoutHistoryEntry[];
@@ -14,6 +19,9 @@ interface WorkoutHistoryProps {
 const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBack }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<WorkoutHistoryEntry | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState<string | null>(null);
+  const imageCardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const { showAlert } = useAlert();
 
   const formatDuration = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -50,6 +58,32 @@ const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBa
     }
   };
 
+  const handleGenerateAndTweet = async (entry: WorkoutHistoryEntry) => {
+    const ref = imageCardRefs.current.get(entry.id);
+    if (!ref) return;
+
+    setIsGeneratingImage(entry.id);
+    try {
+      const imageUrl = await generateWorkoutImage(ref, undefined, entry);
+      const success = await copyImageToClipboard(imageUrl);
+      
+      if (success) {
+        showAlert('画像をクリップボードにコピーしました。Twitterの投稿画面で画像をペースト（Ctrl+V）してください。', '成功');
+        await tweetWithImage(undefined, entry);
+      } else {
+        showAlert('クリップボードへのコピーに失敗しました。通常のツイートに切り替えます。', 'エラー');
+        tweetHistoryEntry(entry);
+      }
+    } catch (error) {
+      console.error('画像生成エラー:', error);
+      showAlert('画像生成に失敗しました。通常のツイートに切り替えます。', 'エラー');
+      // エラー時は通常のツイートにフォールバック
+      tweetHistoryEntry(entry);
+    } finally {
+      setIsGeneratingImage(null);
+    }
+  };
+
   const sortedHistory = [...history].sort((a, b) => b.completedAt - a.completedAt);
 
   return (
@@ -70,25 +104,55 @@ const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBa
           </div>
         ) : (
           sortedHistory.map(entry => (
-            <div key={entry.id} className="bg-gray-700 p-4 rounded-lg flex items-center justify-between shadow-md">
-              <div>
-                <h3 className="text-xl font-bold text-white">{entry.workoutName}</h3>
-                <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-400 mt-1 sm:space-x-4">
-                  <span>{formatDate(entry.completedAt)}</span>
-                  <span className="flex items-center mt-1 sm:mt-0">
-                    <ClockIcon className="w-4 h-4 mr-1" />
-                    {formatDuration(entry.totalDuration)}
-                  </span>
-                </div>
+            <div key={entry.id}>
+              {/* 画像生成用の非表示要素 */}
+              <div className="fixed -left-[9999px] top-0">
+                <WorkoutImageCard 
+                  ref={(el) => {
+                    if (el) imageCardRefs.current.set(entry.id, el);
+                    else imageCardRefs.current.delete(entry.id);
+                  }}
+                  historyEntry={entry} 
+                />
               </div>
-              <div className="flex items-center">
-                <button
-                  onClick={() => openDeleteConfirmation(entry)}
-                  className="p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-colors"
-                  aria-label={`履歴 ${entry.workoutName} を削除`}
-                >
-                  <TrashIcon className="w-5 h-5" />
-                </button>
+              
+              <div className="bg-gray-700 p-4 rounded-lg flex items-center justify-between shadow-md">
+                <div>
+                  <h3 className="text-xl font-bold text-white">{entry.workoutName}</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-400 mt-1 sm:space-x-4">
+                    <span>{formatDate(entry.completedAt)}</span>
+                    <span className="flex items-center mt-1 sm:mt-0">
+                      <ClockIcon className="w-4 h-4 mr-1" />
+                      {formatDuration(entry.totalDuration)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleGenerateAndTweet(entry)}
+                    disabled={isGeneratingImage === entry.id}
+                    className="p-3 bg-sky-500 rounded-full text-white hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-sky-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`${entry.workoutName} を画像でツイート`}
+                    title={isGeneratingImage === entry.id ? '画像生成中...' : '画像でツイート'}
+                  >
+                    <TwitterIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => tweetHistoryEntry(entry)}
+                    className="p-3 bg-gray-600 rounded-full text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-600 transition-colors"
+                    aria-label={`${entry.workoutName} をテキストでツイート`}
+                    title="テキストでツイート"
+                  >
+                    <TwitterIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => openDeleteConfirmation(entry)}
+                    className="p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-colors"
+                    aria-label={`履歴 ${entry.workoutName} を削除`}
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
           ))

@@ -3,23 +3,40 @@ import { Workout } from '../types';
 import ImportConfirmModal from './modals/ImportConfirmModal';
 import DownloadIcon from './icons/DownloadIcon';
 import UploadIcon from './icons/UploadIcon';
+import { loadPresetExercises, PresetExercises } from '../data/presets';
+import { useAlert } from './AlertProvider';
 
 interface LocalFileSyncProps {
   localWorkouts: Workout[];
   onWorkoutsLoaded: (workouts: Workout[]) => void;
+  onPresetsLoaded?: (presets: PresetExercises) => void;
 }
 
-const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkoutsLoaded }) => {
+interface ExportData {
+  workouts: Workout[];
+  exercisePresets?: PresetExercises;
+  version?: string;
+}
+
+const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkoutsLoaded, onPresetsLoaded }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [importedWorkouts, setImportedWorkouts] = useState<Workout[] | null>(null);
+  const [importedPresets, setImportedPresets] = useState<PresetExercises | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showAlert } = useAlert();
 
   const handleExport = () => {
     if (localWorkouts.length === 0) {
-      alert('エクスポートするワークアウトがありません。');
+      showAlert('エクスポートするワークアウトがありません。', 'エラー');
       return;
     }
-    const dataStr = JSON.stringify(localWorkouts, null, 2);
+    const presets = loadPresetExercises();
+    const exportData: ExportData = {
+      workouts: localWorkouts,
+      exercisePresets: presets,
+      version: '1.0',
+    };
+    const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
@@ -46,20 +63,37 @@ const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkouts
         if (typeof text !== 'string') {
             throw new Error("ファイルの読み込みに失敗しました。");
         }
-        const parsedWorkouts = JSON.parse(text);
+        const parsed = JSON.parse(text);
+        
+        // 新しい形式（ExportData）か、古い形式（Workout[]のみ）かを判定
+        let workouts: Workout[] = [];
+        let presets: PresetExercises | null = null;
+        
+        if (parsed.workouts && Array.isArray(parsed.workouts)) {
+          // 新しい形式
+          workouts = parsed.workouts;
+          presets = parsed.exercisePresets || null;
+        } else if (Array.isArray(parsed)) {
+          // 古い形式（後方互換性）
+          workouts = parsed;
+        } else {
+          throw new Error("無効なファイル形式です。");
+        }
+        
         // Basic validation
-        if (Array.isArray(parsedWorkouts) && (parsedWorkouts.length === 0 || (parsedWorkouts[0].id && parsedWorkouts[0].name && parsedWorkouts[0].exercises))) {
-            setImportedWorkouts(parsedWorkouts);
+        if (workouts.length === 0 || (workouts[0].id && workouts[0].name && workouts[0].exercises)) {
+            setImportedWorkouts(workouts);
+            setImportedPresets(presets);
             setIsModalOpen(true);
         } else {
             throw new Error("無効なファイル形式です。");
         }
       } catch (error) {
-        alert(`ファイルのインポートに失敗しました: ${error instanceof Error ? error.message : String(error)}`);
+        showAlert(`ファイルのインポートに失敗しました: ${error instanceof Error ? error.message : String(error)}`, 'エラー');
       }
     };
     reader.onerror = () => {
-        alert("ファイルの読み込み中にエラーが発生しました。");
+        showAlert("ファイルの読み込み中にエラーが発生しました。", 'エラー');
     };
     reader.readAsText(file);
     
@@ -84,12 +118,45 @@ const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkouts
         });
         onWorkoutsLoaded(mergedWorkouts);
     }
+    
+    // マスターデータのインポート処理
+    if (importedPresets && onPresetsLoaded) {
+      if (type === 'overwrite') {
+        onPresetsLoaded(importedPresets);
+      } else { // merge
+        const currentPresets = loadPresetExercises();
+        const mergedPresets: PresetExercises = { ...currentPresets };
+        
+        // インポートしたマスターデータをマージ
+        Object.keys(importedPresets).forEach(bodyPart => {
+          const importedExercises = importedPresets[bodyPart] || [];
+          const currentExercises = mergedPresets[bodyPart] || [];
+          
+          // 重複を避けてマージ
+          const mergedExercises = [...currentExercises];
+          importedExercises.forEach(exName => {
+            if (!mergedExercises.includes(exName)) {
+              mergedExercises.push(exName);
+            }
+          });
+          
+          mergedPresets[bodyPart] = mergedExercises;
+        });
+        
+        onPresetsLoaded(mergedPresets);
+      }
+      showAlert('ワークアウトと種目マスターデータをインポートしました。', '成功');
+    } else {
+      showAlert('ワークアウトをインポートしました。', '成功');
+    }
+    
     closeModal();
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setImportedWorkouts(null);
+    setImportedPresets(null);
   };
   
   return (

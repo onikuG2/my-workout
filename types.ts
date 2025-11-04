@@ -19,4 +19,5 @@ export interface WorkoutHistoryEntry {
   workoutName: string;
   completedAt: number; // timestamp
   totalDuration: number; // in seconds
+  exercises?: Exercise[]; // エクササイズ詳細（オプショナル、後方互換性のため）
 }

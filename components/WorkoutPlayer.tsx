@@ -6,6 +6,11 @@ import PauseIcon from './icons/PauseIcon';
 import StopIcon from './icons/StopIcon';
 import ChevronDoubleLeftIcon from './icons/ChevronDoubleLeftIcon';
 import ChevronDoubleRightIcon from './icons/ChevronDoubleRightIcon';
+import TwitterIcon from './icons/TwitterIcon';
+import { tweetWorkout } from '../utils/twitter';
+import WorkoutImageCard from './WorkoutImageCard';
+import { generateWorkoutImage, copyImageToClipboard, tweetWithImage } from '../utils/workoutImage';
+import { useAlert } from './AlertProvider';
 
 interface WorkoutPlayerProps {
   workout: Workout;
@@ -23,12 +28,63 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
   const [isFinished, setIsFinished] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const imageCardRef = useRef<HTMLDivElement>(null);
+  const { showAlert } = useAlert();
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const currentExercise = workout.exercises[exerciseIndex];
   const totalSets = currentExercise?.sets || 1;
+
+  const playCompletionSound = useCallback(() => {
+    if (!audioContextRef.current) return;
+
+    const audioContext = audioContextRef.current;
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+
+    const now = audioContext.currentTime;
+    
+    // 華やかな完成音：メジャーコード（C-E-G-C）のアーペジオ
+    const notes = [
+      { freq: 523.25, time: 0 },    // C5
+      { freq: 659.25, time: 0.1 },  // E5
+      { freq: 783.99, time: 0.2 },  // G5
+      { freq: 1046.50, time: 0.3 }, // C6
+    ];
+
+    notes.forEach((note, index) => {
+      const oscillator1 = audioContext.createOscillator();
+      const oscillator2 = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator1.type = 'sine';
+      oscillator2.type = 'triangle';
+      
+      oscillator1.frequency.setValueAtTime(note.freq, now + note.time);
+      oscillator2.frequency.setValueAtTime(note.freq * 2, now + note.time); // オクターブ上
+      
+      oscillator1.connect(gainNode);
+      oscillator2.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // エンベロープ：各音が華やかに響く
+      const startTime = now + note.time;
+      const duration = 0.4;
+      
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(0.25, startTime + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      oscillator1.start(startTime);
+      oscillator2.start(startTime);
+      oscillator1.stop(startTime + duration);
+      oscillator2.stop(startTime + duration);
+    });
+  }, []);
 
   const playSound = useCallback((sound: 'tick' | 'end_exercise') => {
     if (!audioContextRef.current) return;
@@ -38,23 +94,60 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
       audioContext.resume();
     }
 
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    const now = audioContext.currentTime;
 
     if (sound === 'tick') {
-        oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // High pitch for tick
-        oscillator.type = 'sine';
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.05);
+      // カウントダウン音：よりクリアで心地よい音
+      const oscillator1 = audioContext.createOscillator();
+      const oscillator2 = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator1.type = 'sine';
+      oscillator2.type = 'sine';
+      
+      // メインの周波数（A5）とハーモニック（オクターブ上）
+      oscillator1.frequency.setValueAtTime(880, now);
+      oscillator2.frequency.setValueAtTime(1760, now);
+      
+      oscillator1.connect(gainNode);
+      oscillator2.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // エンベロープ：滑らかなフェードイン・アウト
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(0.15, now + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+      
+      oscillator1.start(now);
+      oscillator2.start(now);
+      oscillator1.stop(now + 0.08);
+      oscillator2.stop(now + 0.08);
     } else { // end_exercise
-        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Lower pitch for end
-        oscillator.type = 'sine';
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.15);
+      // 終了音：より充実した音
+      const oscillator1 = audioContext.createOscillator();
+      const oscillator2 = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator1.type = 'sine';
+      oscillator2.type = 'triangle';
+      
+      // 美しい和音（C5とE5）
+      oscillator1.frequency.setValueAtTime(523.25, now); // C5
+      oscillator2.frequency.setValueAtTime(659.25, now); // E5
+      
+      oscillator1.connect(gainNode);
+      oscillator2.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // エンベロープ：滑らかなフェードイン・アウト
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(0.2, now + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      
+      oscillator1.start(now);
+      oscillator2.start(now);
+      oscillator1.stop(now + 0.3);
+      oscillator2.stop(now + 0.3);
     }
   }, []);
 
@@ -98,7 +191,8 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
     // Case 4: ワークアウト終了
     setIsFinished(true);
     setIsPaused(true);
-  }, [phase, currentExercise, setIndex, totalSets, exerciseIndex, workout.exercises, playSound]);
+    playCompletionSound();
+  }, [phase, currentExercise, setIndex, totalSets, exerciseIndex, workout.exercises, playSound, playCompletionSound]);
 
   useEffect(() => {
     const firstExercise = workout.exercises[0];
@@ -235,18 +329,67 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
 
   if (!currentExercise) return <div className="text-center">ワークアウトの読み込みに失敗しました。</div>;
   
+  const handleGenerateAndTweet = async () => {
+    if (!imageCardRef.current) return;
+    
+    setIsGeneratingImage(true);
+    try {
+      const imageUrl = await generateWorkoutImage(imageCardRef.current, workout);
+      const success = await copyImageToClipboard(imageUrl);
+      
+      if (success) {
+        showAlert('画像をクリップボードにコピーしました。Twitterの投稿画面で画像をペースト（Ctrl+V）してください。', '成功');
+        await tweetWithImage(workout);
+      } else {
+        showAlert('クリップボードへのコピーに失敗しました。通常のツイートに切り替えます。', 'エラー');
+        tweetWorkout(workout);
+      }
+    } catch (error) {
+      console.error('画像生成エラー:', error);
+      showAlert('画像生成に失敗しました。通常のツイートに切り替えます。', 'エラー');
+      // エラー時は通常のツイートにフォールバック
+      tweetWorkout(workout);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   if (isFinished) {
       return (
-          <div className="flex flex-col items-center justify-center text-center h-96">
-            <h2 className="text-4xl font-bold text-cyan-400 mb-4 z-10">お疲れ様でした！</h2>
-            <p className="text-gray-300 text-lg mb-8 z-10">ワークアウトが完了しました。</p>
-            <button
-                onClick={() => onFinish(workout)}
-                className="py-3 px-8 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition-colors text-lg z-10"
-            >
-                終了する
-            </button>
-          </div>
+          <>
+            {/* 画像生成用の非表示要素 */}
+            <div className="fixed -left-[9999px] top-0">
+              <WorkoutImageCard ref={imageCardRef} workout={workout} />
+            </div>
+            
+            <div className="flex flex-col items-center justify-center text-center h-96">
+              <h2 className="text-4xl font-bold text-cyan-400 mb-4 z-10">お疲れ様でした！</h2>
+              <p className="text-gray-300 text-lg mb-8 z-10">ワークアウトが完了しました。</p>
+              <div className="flex gap-4 z-10">
+                <button
+                    onClick={handleGenerateAndTweet}
+                    disabled={isGeneratingImage}
+                    className="flex items-center justify-center py-3 px-6 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <TwitterIcon className="w-5 h-5 mr-2" />
+                    {isGeneratingImage ? '画像生成中...' : '画像でツイート'}
+                </button>
+                <button
+                    onClick={() => tweetWorkout(workout)}
+                    className="flex items-center justify-center py-3 px-6 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-lg"
+                >
+                    <TwitterIcon className="w-5 h-5 mr-2" />
+                    テキストでツイート
+                </button>
+                <button
+                    onClick={() => onFinish(workout)}
+                    className="py-3 px-8 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 transition-colors text-lg"
+                >
+                    終了する
+                </button>
+              </div>
+            </div>
+          </>
       )
   }
 

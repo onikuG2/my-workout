@@ -6,6 +6,7 @@ import WorkoutPlayer from './components/WorkoutPlayer';
 import WorkoutHistory from './components/WorkoutHistory';
 import ExerciseMaster from './components/ExerciseMaster';
 import ErrorBoundary from './components/ErrorBoundary';
+import { savePresetExercises, PresetExercises } from './data/presets';
 
 type View = 'list' | 'create' | 'player' | 'history' | 'master';
 
@@ -144,6 +145,7 @@ const App: React.FC = () => {
       workoutName: completedWorkout.name,
       completedAt: Date.now(),
       totalDuration: completedWorkout.exercises.reduce((acc, ex) => acc + ((ex.duration || 0) + (ex.restDuration || 0)) * (ex.sets || 1), 0),
+      exercises: completedWorkout.exercises.map(ex => ({ ...ex })), // エクササイズ詳細を保存
     };
     saveWorkoutHistory([...workoutHistory, newHistoryEntry]);
     
@@ -163,6 +165,16 @@ const App: React.FC = () => {
     const updatedHistory = workoutHistory.filter(entry => entry.id !== entryId);
     saveWorkoutHistory(updatedHistory);
   };
+
+  const handlePresetsLoaded = useCallback((presets: PresetExercises) => {
+    try {
+      savePresetExercises(presets);
+      // マスターデータを更新したので、種目マスター画面を開いている場合は更新を反映
+      // WorkoutCreatorは毎回loadPresetExercisesを呼ぶので、次回開く時に反映される
+    } catch (error) {
+      console.error("Failed to save presets", error);
+    }
+  }, []);
 
   const renderContent = () => {
     switch (currentView) {
@@ -192,6 +204,7 @@ const App: React.FC = () => {
           onEdit={handleEditWorkout}
           onShowHistory={handleShowHistory}
           onOpenMaster={handleOpenMaster}
+          onPresetsLoaded={handlePresetsLoaded}
         />;
     }
   };
