@@ -1,0 +1,1320 @@
+{
+  "schemaVersion": 1,
+  "projectPath": "C:/Users/odenm/Documents/git/my-workout",
+  "projectRootName": "my-workout",
+  "graphRenderingMode": "normal",
+  "linkDisplayMode": "all",
+  "graphStats": {
+    "totalNodes": 17,
+    "folders": 6,
+    "files": 11,
+    "images": 0,
+    "videos": 0,
+    "audio": 0,
+    "code": 4,
+    "text": 1,
+    "html": 1,
+    "yaml": 0,
+    "json": 4,
+    "other": 1,
+    "totalLines": 0,
+    "maxLines": 0
+  },
+  "directoryTree": {
+    "name": "my-workout",
+    "type": "directory",
+    "path": "my-workout",
+    "children": [
+      {
+        "name": ".cursor",
+        "type": "directory",
+        "path": ".cursor",
+        "children": [],
+        "hasMore": true
+      },
+      {
+        "name": ".kamui",
+        "type": "directory",
+        "path": ".kamui",
+        "children": [],
+        "hasMore": true
+      },
+      {
+        "name": "components",
+        "type": "directory",
+        "path": "components",
+        "children": [],
+        "hasMore": true
+      },
+      {
+        "name": "data",
+        "type": "directory",
+        "path": "data",
+        "children": []
+      },
+      {
+        "name": "node_modules",
+        "type": "directory",
+        "path": "node_modules",
+        "children": [],
+        "hasMore": true
+      },
+      {
+        "name": ".gitignore",
+        "type": "file",
+        "path": ".gitignore"
+      },
+      {
+        "name": "App.tsx",
+        "type": "file",
+        "path": "App.tsx"
+      },
+      {
+        "name": "index.html",
+        "type": "file",
+        "path": "index.html"
+      },
+      {
+        "name": "index.tsx",
+        "type": "file",
+        "path": "index.tsx"
+      },
+      {
+        "name": "metadata.json",
+        "type": "file",
+        "path": "metadata.json"
+      },
+      {
+        "name": "package-lock.json",
+        "type": "file",
+        "path": "package-lock.json"
+      },
+      {
+        "name": "package.json",
+        "type": "file",
+        "path": "package.json"
+      },
+      {
+        "name": "README.md",
+        "type": "file",
+        "path": "README.md"
+      },
+      {
+        "name": "tsconfig.json",
+        "type": "file",
+        "path": "tsconfig.json"
+      },
+      {
+        "name": "types.ts",
+        "type": "file",
+        "path": "types.ts"
+      },
+      {
+        "name": "vite.config.ts",
+        "type": "file",
+        "path": "vite.config.ts"
+      }
+    ]
+  },
+  "graphData": {
+    "nodes": [
+      {
+        "id": "my-workout",
+        "name": "my-workout",
+        "path": "my-workout",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": null,
+        "childFileCount": 11,
+        "x": 0.4946749296094778,
+        "y": 0.4849557726020355,
+        "z": 0.9443267205102572,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/.cursor",
+        "name": ".cursor",
+        "path": "my-workout/.cursor",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -1.8170190178432932,
+        "y": 0.3971660721504384,
+        "z": 1.5941826475555436,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/.kamui",
+        "name": ".kamui",
+        "path": "my-workout/.kamui",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -1.0066336676833787,
+        "y": 4.206214635108269,
+        "z": 3.216483481395975,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/components",
+        "name": "components",
+        "path": "my-workout/components",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 1.6593835352663322,
+        "y": 2.7423523893208497,
+        "z": 2.5998726186623324,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/data",
+        "name": "data",
+        "path": "my-workout/data",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 31.90124365444658,
+        "y": 19.698582320554035,
+        "z": -30.550331267749506,
+        "vx": 4.250887413366962,
+        "vy": 2.7006852831752446,
+        "vz": -4.232778419353045
+      },
+      {
+        "id": "my-workout/node_modules",
+        "name": "node_modules",
+        "path": "my-workout/node_modules",
+        "type": "directory",
+        "lines": 0,
+        "val": 14,
+        "color": "#4d515a",
+        "baseColor": "#4ec9b0",
+        "originalColor": "#4ec9b0",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 0.25736274553019867,
+        "y": -1.739137284441235,
+        "z": -3.029866442969805,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/.gitignore",
+        "name": ".gitignore",
+        "path": "my-workout/.gitignore",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#57606f",
+        "baseColor": "#57606f",
+        "originalColor": "#57606f",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -2.729407092882987,
+        "y": 1.6812113196609042,
+        "z": -2.809855532273782,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/App.tsx",
+        "name": "App.tsx",
+        "path": "my-workout/App.tsx",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#61dafb",
+        "baseColor": "#61dafb",
+        "originalColor": "#61dafb",
+        "defaultGlow": 0.1,
+        "glowIntensity": 0.1,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 47.65250421147558,
+        "y": -11.55416008570599,
+        "z": -7.770101979375206,
+        "vx": 6.566373364398642,
+        "vy": -1.6534490248052958,
+        "vz": -1.2156101642100794
+      },
+      {
+        "id": "my-workout/index.html",
+        "name": "index.html",
+        "path": "my-workout/index.html",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#e44d26",
+        "baseColor": "#e44d26",
+        "originalColor": "#e44d26",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -40.75777164226974,
+        "y": -23.58477684063253,
+        "z": 11.533443875210144,
+        "vx": -5.709408186771036,
+        "vy": -3.2063240206894625,
+        "vz": 1.453807554953046
+      },
+      {
+        "id": "my-workout/index.tsx",
+        "name": "index.tsx",
+        "path": "my-workout/index.tsx",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#61dafb",
+        "baseColor": "#61dafb",
+        "originalColor": "#61dafb",
+        "defaultGlow": 0.1,
+        "glowIntensity": 0.1,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -3.6877159462284523,
+        "y": 33.91830427249885,
+        "z": -35.21279044226838,
+        "vx": -0.5955730340742426,
+        "vy": 4.747323291163635,
+        "vz": -5.042816139820762
+      },
+      {
+        "id": "my-workout/metadata.json",
+        "name": "metadata.json",
+        "path": "my-workout/metadata.json",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#8e44ad",
+        "baseColor": "#8e44ad",
+        "originalColor": "#8e44ad",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -33.63488806065634,
+        "y": 13.82734217356538,
+        "z": 32.87369491237757,
+        "vx": -4.6651467229979335,
+        "vy": 1.9100877239839005,
+        "vz": 4.349471987514657
+      },
+      {
+        "id": "my-workout/package-lock.json",
+        "name": "package-lock.json",
+        "path": "my-workout/package-lock.json",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#8e44ad",
+        "baseColor": "#8e44ad",
+        "originalColor": "#8e44ad",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -38.791700827895454,
+        "y": 28.302642743025245,
+        "z": -6.888432925678019,
+        "vx": -5.379789754258922,
+        "vy": 3.883374526229476,
+        "vz": -1.0916835423693287
+      },
+      {
+        "id": "my-workout/package.json",
+        "name": "package.json",
+        "path": "my-workout/package.json",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#8e44ad",
+        "baseColor": "#8e44ad",
+        "originalColor": "#8e44ad",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 18.94356257968038,
+        "y": -44.1800362035323,
+        "z": 8.623205092393986,
+        "vx": 2.5057882620497276,
+        "vy": -6.080649492017598,
+        "vz": 1.0709070446358655
+      },
+      {
+        "id": "my-workout/README.md",
+        "name": "README.md",
+        "path": "my-workout/README.md",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#3498db",
+        "baseColor": "#3498db",
+        "originalColor": "#3498db",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 34.795669745962975,
+        "y": -12.2538863186553,
+        "z": 34.05073429161445,
+        "vx": 4.767817633139073,
+        "vy": -1.6802030478831864,
+        "vz": 4.641207254095919
+      },
+      {
+        "id": "my-workout/tsconfig.json",
+        "name": "tsconfig.json",
+        "path": "my-workout/tsconfig.json",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#8e44ad",
+        "baseColor": "#8e44ad",
+        "originalColor": "#8e44ad",
+        "defaultGlow": 0.18,
+        "glowIntensity": 0.18,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -2.4735335974653148,
+        "y": 48.666838036801494,
+        "z": 9.91072333576869,
+        "vx": -0.4391371187422428,
+        "vy": 6.745605110868827,
+        "vz": 1.2349466200353512
+      },
+      {
+        "id": "my-workout/types.ts",
+        "name": "types.ts",
+        "path": "my-workout/types.ts",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#3178c6",
+        "baseColor": "#3178c6",
+        "originalColor": "#3178c6",
+        "defaultGlow": 0.1,
+        "glowIntensity": 0.1,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": 4.403141502759067,
+        "y": -1.6645382799079282,
+        "z": -2.1418818500567687,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      },
+      {
+        "id": "my-workout/vite.config.ts",
+        "name": "vite.config.ts",
+        "path": "my-workout/vite.config.ts",
+        "type": "file",
+        "lines": 0,
+        "val": 6,
+        "color": "#3178c6",
+        "baseColor": "#3178c6",
+        "originalColor": "#3178c6",
+        "defaultGlow": 0.1,
+        "glowIntensity": 0.1,
+        "highlighted": false,
+        "parentPath": "my-workout",
+        "childFileCount": 0,
+        "x": -3.821425653244066,
+        "y": 1.3640631509792218,
+        "z": 4.40846328970184,
+        "vx": 0.025745858774152253,
+        "vy": 0.1043135885731071,
+        "vz": 0.09263763300777376
+      }
+    ],
+    "links": [
+      {
+        "source": "my-workout",
+        "target": "my-workout/.cursor",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/.kamui",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/components",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/data",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/node_modules",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/.gitignore",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/App.tsx",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/index.html",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/index.tsx",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/metadata.json",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/package-lock.json",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/package.json",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/README.md",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/tsconfig.json",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/types.ts",
+        "type": "tree"
+      },
+      {
+        "source": "my-workout",
+        "target": "my-workout/vite.config.ts",
+        "type": "tree"
+      }
+    ]
+  },
+  "trackedFiles": [
+    ".cursor/worktrees.json",
+    ".gitignore",
+    "App.tsx",
+    "README.md",
+    "components/AlertProvider.tsx",
+    "components/ErrorBoundary.tsx",
+    "components/GoogleDriveSync.tsx",
+    "components/LocalFileSync.tsx",
+    "components/WorkoutCreator.tsx",
+    "components/WorkoutHistory.tsx",
+    "components/WorkoutList.tsx",
+    "components/WorkoutPlayer.tsx",
+    "components/icons/ChevronDoubleLeftIcon.tsx",
+    "components/icons/ChevronDoubleRightIcon.tsx",
+    "components/icons/ChevronLeftIcon.tsx",
+    "components/icons/ClockIcon.tsx",
+    "components/icons/DownloadIcon.tsx",
+    "components/icons/GoogleDriveIcon.tsx",
+    "components/icons/HistoryIcon.tsx",
+    "components/icons/PauseIcon.tsx",
+    "components/icons/PencilIcon.tsx",
+    "components/icons/PlayIcon.tsx",
+    "components/icons/PlusIcon.tsx",
+    "components/icons/SparklesIcon.tsx",
+    "components/icons/SpinnerIcon.tsx",
+    "components/icons/StopIcon.tsx",
+    "components/icons/TrashIcon.tsx",
+    "components/icons/UploadIcon.tsx",
+    "components/modals/AlertModal.tsx",
+    "components/modals/ConfirmModal.tsx",
+    "components/modals/ImportConfirmModal.tsx",
+    "components/modals/MergeConfirmModal.tsx",
+    "components/modals/PresetWorkoutModal.tsx",
+    "data/defaultWorkouts.ts",
+    "index.html",
+    "index.tsx",
+    "metadata.json",
+    "package-lock.json",
+    "package.json",
+    "tsconfig.json",
+    "types.ts",
+    "vite.config.ts"
+  ],
+  "uiState": {
+    "expandedDirs": [
+      "my-workout",
+      "my-workout/my-workout",
+      "my-workout/.kamui",
+      "my-workout/my-workout/.kamui",
+      "my-workout/.kamui/prompt",
+      "my-workout/my-workout/.kamui/prompt"
+    ],
+    "selectedPath": null
+  },
+  "directoryTreeMeta": {
+    "mode": "full",
+    "maxDepthApplied": 10,
+    "maxEntriesPerDirectory": 0,
+    "isPartial": false
+  },
+  "gitHistoryMeta": {
+    "mode": "full",
+    "isPartial": false,
+    "branchPulse": null
+  },
+  "gitHistoryState": {
+    "selectedTimelineIndex": 1,
+    "activeCommitHash": null,
+    "entries": [
+      {
+        "type": "live",
+        "label": "現在のコードベース",
+        "files": [],
+        "branch": "main",
+        "targetCommitHash": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+        "worktreePath": "C:/Users/odenm/Documents/git/my-workout",
+        "timestamp": 1762214978493,
+        "lane": 0,
+        "branchLabel": "main",
+        "branchTags": [
+          "main"
+        ],
+        "isDefaultWorktree": true,
+        "branchColor": "#4f85e8",
+        "index": 0
+      },
+      {
+        "type": "unstaged",
+        "label": "未ステージ (4)",
+        "files": [
+          ".kamui/model-versions-cache.json",
+          ".kamui/prompt/merge-prompt.txt",
+          ".kamui/system-graph-state.json",
+          ".kamui/tasks-state.json"
+        ],
+        "branch": "main",
+        "targetCommitHash": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+        "worktreePath": "C:/Users/odenm/Documents/git/my-workout",
+        "timestamp": 1762214978493,
+        "sortOrder": 0,
+        "lane": 0,
+        "branchColor": "#4f85e8",
+        "index": 1
+      },
+      {
+        "type": "staged",
+        "label": "ステージ済み (1)",
+        "files": [
+          "EADME.md"
+        ],
+        "branch": "main",
+        "targetCommitHash": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+        "worktreePath": "C:/Users/odenm/Documents/git/my-workout",
+        "timestamp": 1762214978493,
+        "sortOrder": 1,
+        "lane": 0,
+        "branchColor": "#4f85e8",
+        "index": 2
+      },
+      {
+        "type": "commit",
+        "label": "docs: Add usage instructions to README.md",
+        "commit": {
+          "hash": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+          "subject": "docs: Add usage instructions to README.md",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762214123,
+          "parents": [
+            "567d75e8c934db528959c14776dc2198485235e9"
+          ],
+          "parent": "567d75e8c934db528959c14776dc2198485235e9",
+          "refs": "HEAD -> main, origin/main, origin/HEAD",
+          "branches": [
+            "HEAD -> main",
+            "origin/main",
+            "origin/HEAD",
+            "main"
+          ]
+        },
+        "commitHash": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "567d75e8c934db528959c14776dc2198485235e9",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [
+          "main"
+        ],
+        "worktrees": [
+          {
+            "path": "C:/Users/odenm/Documents/git/my-workout",
+            "head": "24402dac25fd136d4ad37531437bb4dc1fad013c",
+            "branch": "main",
+            "isMerged": false,
+            "mergeCommitHash": null,
+            "status": {
+              "staged": [
+                {
+                  "path": "EADME.md",
+                  "originalPath": null,
+                  "status": "modified",
+                  "rawPath": "EADME.md",
+                  "timestamp": 1762214975349
+                }
+              ],
+              "unstaged": [],
+              "untracked": [
+                {
+                  "path": ".kamui/model-versions-cache.json",
+                  "status": "untracked",
+                  "rawPath": ".kamui/model-versions-cache.json",
+                  "timestamp": 1762214975349
+                },
+                {
+                  "path": ".kamui/prompt/merge-prompt.txt",
+                  "status": "untracked",
+                  "rawPath": ".kamui/prompt/merge-prompt.txt",
+                  "timestamp": 1762214975349
+                },
+                {
+                  "path": ".kamui/system-graph-state.json",
+                  "status": "untracked",
+                  "rawPath": ".kamui/system-graph-state.json",
+                  "timestamp": 1762214975349
+                },
+                {
+                  "path": ".kamui/tasks-state.json",
+                  "status": "untracked",
+                  "rawPath": ".kamui/tasks-state.json",
+                  "timestamp": 1762214975349
+                }
+              ],
+              "capturedAt": 1762214975349
+            },
+            "normalizedPath": "C:/Users/odenm/Documents/git/my-workout",
+            "lane": 0
+          }
+        ],
+        "index": 3
+      },
+      {
+        "type": "commit",
+        "label": "修正",
+        "commit": {
+          "hash": "567d75e8c934db528959c14776dc2198485235e9",
+          "subject": "修正",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762175339,
+          "parents": [
+            "376601b5d7dd773472ab3acd83a26f85422b074f"
+          ],
+          "parent": "376601b5d7dd773472ab3acd83a26f85422b074f",
+          "refs": "",
+          "branches": [
+            "main"
+          ]
+        },
+        "commitHash": "567d75e8c934db528959c14776dc2198485235e9",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "376601b5d7dd773472ab3acd83a26f85422b074f",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 4
+      },
+      {
+        "type": "commit",
+        "label": "エクササイズ作成時に鍛えたい部位を選択してそれに付随する種目を表示するようにした",
+        "commit": {
+          "hash": "376601b5d7dd773472ab3acd83a26f85422b074f",
+          "subject": "エクササイズ作成時に鍛えたい部位を選択してそれに付随する種目を表示するようにした",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762175159,
+          "parents": [
+            "95c805b47c5190adb17db47e9e02c478cd9637d9"
+          ],
+          "parent": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+          "refs": "",
+          "branches": [
+            "main"
+          ]
+        },
+        "commitHash": "376601b5d7dd773472ab3acd83a26f85422b074f",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 5
+      },
+      {
+        "type": "unstaged",
+        "label": "未ステージ [feat-exercise-part-filter-ltXMJ] (1)",
+        "files": [
+          "package-lock.json"
+        ],
+        "branch": "feat-exercise-part-filter-ltXMJ",
+        "targetCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+        "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+        "timestamp": 1762214975351,
+        "sortOrder": 0,
+        "lane": 1,
+        "branchColor": "#e84f7f",
+        "index": 6
+      },
+      {
+        "type": "staged",
+        "label": "ステージ済み [feat-exercise-part-filter-ltXMJ] (1)",
+        "files": [
+          "omponents/WorkoutCreator.tsx"
+        ],
+        "branch": "feat-exercise-part-filter-ltXMJ",
+        "targetCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+        "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+        "timestamp": 1762214975351,
+        "sortOrder": 1,
+        "lane": 1,
+        "branchColor": "#e84f7f",
+        "index": 7
+      },
+      {
+        "type": "anchor",
+        "label": "[feat-exercise-part-filter-ltXMJ]",
+        "branch": "feat-exercise-part-filter-ltXMJ",
+        "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+        "parentCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+        "lane": 1,
+        "isMerged": false,
+        "mergeCommitHash": null,
+        "statusChildren": [
+          {
+            "type": "unstaged",
+            "label": "未ステージ [feat-exercise-part-filter-ltXMJ] (1)",
+            "files": [
+              "package-lock.json"
+            ],
+            "branch": "feat-exercise-part-filter-ltXMJ",
+            "targetCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+            "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+            "timestamp": 1762214975351,
+            "sortOrder": 0,
+            "lane": 1,
+            "branchColor": "#e84f7f",
+            "index": 6
+          },
+          {
+            "type": "staged",
+            "label": "ステージ済み [feat-exercise-part-filter-ltXMJ] (1)",
+            "files": [
+              "omponents/WorkoutCreator.tsx"
+            ],
+            "branch": "feat-exercise-part-filter-ltXMJ",
+            "targetCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+            "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+            "timestamp": 1762214975351,
+            "sortOrder": 1,
+            "lane": 1,
+            "branchColor": "#e84f7f",
+            "index": 7
+          }
+        ],
+        "isDefaultWorktree": false,
+        "renderMode": "node",
+        "shouldHide": false,
+        "tagLabel": "feat-exercise-part-filter-ltXMJ",
+        "taskId": "feat-exercise-part-filter-ltXMJ",
+        "taskStatus": null,
+        "taskStatusLabel": null,
+        "taskName": null,
+        "tooltip": "ID: feat-exercise-part-filter-ltXMJ\nBranch: feat-exercise-part-filter-ltXMJ\nWorktree: C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+        "branchColor": "#e84f7f",
+        "index": 8
+      },
+      {
+        "type": "anchor",
+        "label": "[2025-11-03-o4q3-NZUIE]",
+        "branch": "2025-11-03-o4q3-NZUIE",
+        "worktreePath": "C:/Users/odenm/.cursor/worktrees/_____________/NZUIE",
+        "parentCommitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+        "lane": 2,
+        "isMerged": false,
+        "mergeCommitHash": null,
+        "statusChildren": [],
+        "isDefaultWorktree": false,
+        "renderMode": "node",
+        "shouldHide": false,
+        "tagLabel": "2025-11-03-o4q3-NZUIE",
+        "taskId": "2025-11-03-o4q3-NZUIE",
+        "taskStatus": null,
+        "taskStatusLabel": null,
+        "taskName": null,
+        "tooltip": "ID: 2025-11-03-o4q3-NZUIE\nBranch: 2025-11-03-o4q3-NZUIE\nWorktree: C:/Users/odenm/.cursor/worktrees/_____________/NZUIE",
+        "branchColor": "#4fe8b8",
+        "index": 9
+      },
+      {
+        "type": "commit",
+        "label": "feat: Implement confetti and error handling",
+        "commit": {
+          "hash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+          "subject": "feat: Implement confetti and error handling",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762094496,
+          "parents": [
+            "fefaac52180e26628c070cc40d72ecab83e2c33a"
+          ],
+          "parent": "fefaac52180e26628c070cc40d72ecab83e2c33a",
+          "refs": "feat-exercise-part-filter-ltXMJ, 2025-11-03-o4q3-NZUIE",
+          "branches": [
+            "feat-exercise-part-filter-ltXMJ",
+            "2025-11-03-o4q3-NZUIE",
+            "main"
+          ]
+        },
+        "commitHash": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "fefaac52180e26628c070cc40d72ecab83e2c33a",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "worktrees": [
+          {
+            "path": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+            "head": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+            "branch": "feat-exercise-part-filter-ltXMJ",
+            "isMerged": false,
+            "mergeCommitHash": null,
+            "status": {
+              "staged": [
+                {
+                  "path": "omponents/WorkoutCreator.tsx",
+                  "originalPath": null,
+                  "status": "modified",
+                  "rawPath": "omponents/WorkoutCreator.tsx",
+                  "timestamp": 1762214975351
+                }
+              ],
+              "unstaged": [],
+              "untracked": [
+                {
+                  "path": "package-lock.json",
+                  "status": "untracked",
+                  "rawPath": "package-lock.json",
+                  "timestamp": 1762214975351
+                }
+              ],
+              "capturedAt": 1762214975351
+            },
+            "normalizedPath": "C:/Users/odenm/.cursor/worktrees/_____________/ltXMJ",
+            "lane": 1
+          },
+          {
+            "path": "C:/Users/odenm/.cursor/worktrees/_____________/NZUIE",
+            "head": "95c805b47c5190adb17db47e9e02c478cd9637d9",
+            "branch": "2025-11-03-o4q3-NZUIE",
+            "isMerged": false,
+            "mergeCommitHash": null,
+            "status": {
+              "staged": [],
+              "unstaged": [],
+              "untracked": [],
+              "capturedAt": 1762214975380
+            },
+            "normalizedPath": "C:/Users/odenm/.cursor/worktrees/_____________/NZUIE",
+            "lane": 2
+          }
+        ],
+        "index": 10
+      },
+      {
+        "type": "commit",
+        "label": "feat: Enhance workout duration calculation and add presets",
+        "commit": {
+          "hash": "fefaac52180e26628c070cc40d72ecab83e2c33a",
+          "subject": "feat: Enhance workout duration calculation and add presets",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762085286,
+          "parents": [
+            "45a1c8ac3aca1684aef069992e5bbf208b3eab15"
+          ],
+          "parent": "45a1c8ac3aca1684aef069992e5bbf208b3eab15",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "fefaac52180e26628c070cc40d72ecab83e2c33a",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "45a1c8ac3aca1684aef069992e5bbf208b3eab15",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 11
+      },
+      {
+        "type": "commit",
+        "label": "refactor: Clean up project files and README",
+        "commit": {
+          "hash": "45a1c8ac3aca1684aef069992e5bbf208b3eab15",
+          "subject": "refactor: Clean up project files and README",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762074116,
+          "parents": [
+            "5a94e8752509255ce95ce1c20f5d11e2c2dd15f2"
+          ],
+          "parent": "5a94e8752509255ce95ce1c20f5d11e2c2dd15f2",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "45a1c8ac3aca1684aef069992e5bbf208b3eab15",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "5a94e8752509255ce95ce1c20f5d11e2c2dd15f2",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 12
+      },
+      {
+        "type": "commit",
+        "label": "RADME (#1)",
+        "commit": {
+          "hash": "5a94e8752509255ce95ce1c20f5d11e2c2dd15f2",
+          "subject": "RADME (#1)",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762040891,
+          "parents": [
+            "450ac97d8551350f64f03e3f4e0de35b74f74781"
+          ],
+          "parent": "450ac97d8551350f64f03e3f4e0de35b74f74781",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "5a94e8752509255ce95ce1c20f5d11e2c2dd15f2",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "450ac97d8551350f64f03e3f4e0de35b74f74781",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 13
+      },
+      {
+        "type": "commit",
+        "label": "kamui導入",
+        "commit": {
+          "hash": "450ac97d8551350f64f03e3f4e0de35b74f74781",
+          "subject": "kamui導入",
+          "author": "JitsuhaOniku",
+          "timestamp": 1762036622,
+          "parents": [
+            "5209f4240b4151ef5ea4d68bab2734aa18435f61"
+          ],
+          "parent": "5209f4240b4151ef5ea4d68bab2734aa18435f61",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "450ac97d8551350f64f03e3f4e0de35b74f74781",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "5209f4240b4151ef5ea4d68bab2734aa18435f61",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 14
+      },
+      {
+        "type": "commit",
+        "label": "feat: Add workout history tracking",
+        "commit": {
+          "hash": "5209f4240b4151ef5ea4d68bab2734aa18435f61",
+          "subject": "feat: Add workout history tracking",
+          "author": "JitsuhaOniku",
+          "timestamp": 1761998078,
+          "parents": [
+            "9583964682188ea32804ba254bb52ed9368d4657"
+          ],
+          "parent": "9583964682188ea32804ba254bb52ed9368d4657",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "5209f4240b4151ef5ea4d68bab2734aa18435f61",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "9583964682188ea32804ba254bb52ed9368d4657",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 15
+      },
+      {
+        "type": "commit",
+        "label": "feat: Integrate Google Drive sync and improve local storage …",
+        "commit": {
+          "hash": "9583964682188ea32804ba254bb52ed9368d4657",
+          "subject": "feat: Integrate Google Drive sync and improve local storage handling",
+          "author": "JitsuhaOniku",
+          "timestamp": 1761709411,
+          "parents": [
+            "8879daa014355410173e9f290eee79b423121e70"
+          ],
+          "parent": "8879daa014355410173e9f290eee79b423121e70",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "9583964682188ea32804ba254bb52ed9368d4657",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "8879daa014355410173e9f290eee79b423121e70",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 16
+      },
+      {
+        "type": "commit",
+        "label": "feat: Introduce cookie-based storage and improve UI",
+        "commit": {
+          "hash": "8879daa014355410173e9f290eee79b423121e70",
+          "subject": "feat: Introduce cookie-based storage and improve UI",
+          "author": "JitsuhaOniku",
+          "timestamp": 1761707047,
+          "parents": [
+            "50bae9bcfd4c6c9f4699197b3f5cb74b7eccc079"
+          ],
+          "parent": "50bae9bcfd4c6c9f4699197b3f5cb74b7eccc079",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "8879daa014355410173e9f290eee79b423121e70",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "50bae9bcfd4c6c9f4699197b3f5cb74b7eccc079",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 17
+      },
+      {
+        "type": "commit",
+        "label": "feat: Initializeマイワークアウト application with Vite",
+        "commit": {
+          "hash": "50bae9bcfd4c6c9f4699197b3f5cb74b7eccc079",
+          "subject": "feat: Initializeマイワークアウト application with Vite",
+          "author": "JitsuhaOniku",
+          "timestamp": 1761705831,
+          "parents": [
+            "626f1367280369beec363d5949dd626851ad431a"
+          ],
+          "parent": "626f1367280369beec363d5949dd626851ad431a",
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "50bae9bcfd4c6c9f4699197b3f5cb74b7eccc079",
+        "lane": 0,
+        "parentLinks": [
+          {
+            "hash": "626f1367280369beec363d5949dd626851ad431a",
+            "lane": 0
+          }
+        ],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 18
+      },
+      {
+        "type": "commit",
+        "label": "Initial commit",
+        "commit": {
+          "hash": "626f1367280369beec363d5949dd626851ad431a",
+          "subject": "Initial commit",
+          "author": "JitsuhaOniku",
+          "timestamp": 1761705814,
+          "parents": [],
+          "parent": null,
+          "refs": "",
+          "branches": [
+            "2025-11-03-o4q3-NZUIE",
+            "feat-exercise-part-filter-ltXMJ",
+            "main"
+          ]
+        },
+        "commitHash": "626f1367280369beec363d5949dd626851ad431a",
+        "lane": 0,
+        "parentLinks": [],
+        "primaryBranchName": "main",
+        "branchColor": "#4f85e8",
+        "branchTags": [],
+        "index": 19
+      },
+      {
+        "type": "empty",
+        "label": "初期状態 (初回コミット以前)",
+        "files": [],
+        "marker": "pre-history",
+        "index": 20
+      }
+    ]
+  },
+  "projectRoot": "C:/Users/odenm/Documents/git/my-workout",
+  "savedAt": 1762214981391
+}
