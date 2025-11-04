@@ -47,6 +47,10 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
     });
   const { showAlert } = useAlert();
   const [selectedBodyParts, setSelectedBodyParts] = useState<string[]>([]);
+  const [customDurationFlags, setCustomDurationFlags] = useState<boolean[]>([]);
+  const [customRepsFlags, setCustomRepsFlags] = useState<boolean[]>([]);
+  const [customRestFlags, setCustomRestFlags] = useState<boolean[]>([]);
+  
 
   useEffect(() => {
     if (workoutToEdit) {
@@ -54,6 +58,13 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       // 初期表示時に各エクササイズから部位を推定
       const initialBodyParts = (workoutToEdit.exercises || []).map(ex => findBodyPartByExercise(ex.name || ''));
       setSelectedBodyParts(initialBodyParts);
+      // 既存値がプリセット外なら任意入力フラグをON
+      const initCustomDuration = (workoutToEdit.exercises || []).map(ex => !durationPresets.includes(ex.duration || 0) && (ex.duration || 0) > 0);
+      const initCustomReps = (workoutToEdit.exercises || []).map(ex => !repsPresets.includes(ex.reps || 0) && (ex.reps || 0) > 0);
+      const initCustomRest = (workoutToEdit.exercises || []).map(ex => !restPresets.includes(ex.restDuration || 0) && (ex.restDuration || 0) > 0);
+      setCustomDurationFlags(initCustomDuration);
+      setCustomRepsFlags(initCustomReps);
+      setCustomRestFlags(initCustomRest);
     } else {
       // Set a default empty state for new workouts
       setWorkout({
@@ -62,6 +73,9 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
         exercises: [],
       });
       setSelectedBodyParts([]);
+      setCustomDurationFlags([]);
+      setCustomRepsFlags([]);
+      setCustomRestFlags([]);
     }
   }, [workoutToEdit]);
 
@@ -96,6 +110,9 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
       exercises: [...workout.exercises, newExercise],
     });
     setSelectedBodyParts(prev => [...prev, '全身']);
+    setCustomDurationFlags(prev => [...prev, false]);
+    setCustomRepsFlags(prev => [...prev, false]);
+    setCustomRestFlags(prev => [...prev, false]);
   };
 
   const removeExercise = (index: number) => {
@@ -118,6 +135,61 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
     }
   };
 
+  const handleSelectWithCustom = (
+    index: number,
+    field: 'duration' | 'reps' | 'restDuration',
+    value: number,
+  ) => {
+    if (field === 'duration') {
+      if (value === -1) {
+        setCustomDurationFlags(prev => {
+          const next = [...prev];
+          next[index] = true;
+          return next;
+        });
+      } else {
+        setCustomDurationFlags(prev => {
+          const next = [...prev];
+          next[index] = false;
+          return next;
+        });
+        handleExerciseChange(index, 'duration', value);
+      }
+    }
+    if (field === 'reps') {
+      if (value === -1) {
+        setCustomRepsFlags(prev => {
+          const next = [...prev];
+          next[index] = true;
+          return next;
+        });
+      } else {
+        setCustomRepsFlags(prev => {
+          const next = [...prev];
+          next[index] = false;
+          return next;
+        });
+        handleExerciseChange(index, 'reps', value);
+      }
+    }
+    if (field === 'restDuration') {
+      if (value === -1) {
+        setCustomRestFlags(prev => {
+          const next = [...prev];
+          next[index] = true;
+          return next;
+        });
+      } else {
+        setCustomRestFlags(prev => {
+          const next = [...prev];
+          next[index] = false;
+          return next;
+        });
+        handleExerciseChange(index, 'restDuration', value);
+      }
+    }
+  };
+
   const handleSave = () => {
     if (!workout.name.trim()) {
       showAlert('ワークアウト名を入力してください。', '入力エラー');
@@ -132,8 +204,8 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
         showAlert('すべてのエクササイズに名前を入力してください。', '入力エラー');
         return;
       }
-       if ((!ex.duration || ex.duration <= 0) && (!ex.reps || ex.reps <= 0)) {
-        showAlert(`「${ex.name}」には時間または回数のいずれかを0より大きい値に設定してください。`, '入力エラー');
+      if ((!ex.duration || ex.duration <= 0) && (!ex.reps || ex.reps <= 0)) {
+        showAlert(`「${ex.name}」にはワークタイムまたは回数のいずれかを0より大きい値に設定してください。`, '入力エラー');
         return;
       }
     }
@@ -160,6 +232,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
           placeholder="ワークアウト名 (例: 全身HIIT)"
           className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
         />
+        
       </div>
 
       <div className="space-y-4">
@@ -203,20 +276,38 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-               <InputField label="時間 (秒)">
-                 <select value={exercise.duration || 0} onChange={e => handleExerciseChange(index, 'duration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
-                    {durationPresets.map(d => <option key={`dur-${d}`} value={d}>{d}s</option>)}
-                 </select>
+               <InputField label="ワークタイム (秒)">
+                 <div className="flex items-center gap-2">
+                   <select value={customDurationFlags[index] ? -1 : (exercise.duration || 0)} onChange={e => handleSelectWithCustom(index, 'duration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                      <option value={-1}>任意入力…</option>
+                      {durationPresets.map(d => <option key={`dur-${d}`} value={d}>{d}s</option>)}
+                   </select>
+                   {customDurationFlags[index] && (
+                     <input type="number" min={0} placeholder="秒" value={exercise.duration || 0} onChange={e => handleExerciseChange(index, 'duration', Number(e.target.value))} className="w-28 bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-right" />
+                   )}
+                 </div>
                </InputField>
                <InputField label="回数">
-                  <select value={exercise.reps || 0} onChange={e => handleExerciseChange(index, 'reps', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
-                    {repsPresets.map(r => <option key={`rep-${r}`} value={r}>{r}回</option>)}
-                 </select>
+                 <div className="flex items-center gap-2">
+                   <select value={customRepsFlags[index] ? -1 : (exercise.reps || 0)} onChange={e => handleSelectWithCustom(index, 'reps', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                     <option value={-1}>任意入力…</option>
+                     {repsPresets.map(r => <option key={`rep-${r}`} value={r}>{r}回</option>)}
+                   </select>
+                   {customRepsFlags[index] && (
+                     <input type="number" min={0} placeholder="回" value={exercise.reps || 0} onChange={e => handleExerciseChange(index, 'reps', Number(e.target.value))} className="w-28 bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-right" />
+                   )}
+                 </div>
                </InputField>
                <InputField label="休憩 (秒)">
-                 <select value={exercise.restDuration || 0} onChange={e => handleExerciseChange(index, 'restDuration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
-                    {restPresets.map(r => <option key={`rest-${r}`} value={r}>{r}s</option>)}
-                 </select>
+                 <div className="flex items-center gap-2">
+                   <select value={customRestFlags[index] ? -1 : (exercise.restDuration || 0)} onChange={e => handleSelectWithCustom(index, 'restDuration', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
+                      <option value={-1}>任意入力…</option>
+                      {restPresets.map(r => <option key={`rest-${r}`} value={r}>{r}s</option>)}
+                   </select>
+                   {customRestFlags[index] && (
+                     <input type="number" min={0} placeholder="秒" value={exercise.restDuration || 0} onChange={e => handleExerciseChange(index, 'restDuration', Number(e.target.value))} className="w-28 bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-right" />
+                   )}
+                 </div>
                </InputField>
                <InputField label="セット数">
                  <select value={exercise.sets || 1} onChange={e => handleExerciseChange(index, 'sets', Number(e.target.value))} className="bg-gray-900 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition appearance-none text-center w-full">
@@ -231,7 +322,7 @@ const WorkoutCreator: React.FC<WorkoutCreatorProps> = ({ onSave, onCancel, worko
             </div>
             
              <p className="text-xs text-gray-500 text-center col-span-2 md:col-span-3">
-                時間を0に設定すると回数ベースのトレーニングになります。
+                ワークタイムを0に設定すると回数ベースのトレーニングになります。
              </p>
 
           </div>

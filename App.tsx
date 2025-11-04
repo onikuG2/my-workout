@@ -4,9 +4,10 @@ import WorkoutList from './components/WorkoutList';
 import WorkoutCreator from './components/WorkoutCreator';
 import WorkoutPlayer from './components/WorkoutPlayer';
 import WorkoutHistory from './components/WorkoutHistory';
+import ExerciseMaster from './components/ExerciseMaster';
 import ErrorBoundary from './components/ErrorBoundary';
 
-type View = 'list' | 'create' | 'player' | 'history';
+type View = 'list' | 'create' | 'player' | 'history' | 'master';
 
 // --- Cookie Helper Functions ---
 function setCookie(name: string, value: string, days: number) {
@@ -154,6 +155,10 @@ const App: React.FC = () => {
     setCurrentView('history');
   };
 
+  const handleOpenMaster = () => {
+    setCurrentView('master');
+  };
+
   const handleDeleteHistoryEntry = (entryId: string) => {
     const updatedHistory = workoutHistory.filter(entry => entry.id !== entryId);
     saveWorkoutHistory(updatedHistory);
@@ -174,6 +179,8 @@ const App: React.FC = () => {
           onDelete={handleDeleteHistoryEntry}
           onBack={() => setCurrentView('list')}
         />;
+      case 'master':
+        return <ExerciseMaster onBack={() => setCurrentView('list')} />;
       case 'list':
       default:
         return <WorkoutList 
@@ -184,6 +191,7 @@ const App: React.FC = () => {
           onDelete={handleDeleteWorkout}
           onEdit={handleEditWorkout}
           onShowHistory={handleShowHistory}
+          onOpenMaster={handleOpenMaster}
         />;
     }
   };

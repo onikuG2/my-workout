@@ -19,6 +19,7 @@ interface WorkoutListProps {
   onDelete: (workoutId: string) => void;
   onEdit: (workout: Workout) => void;
   onShowHistory: () => void;
+  onOpenMaster: () => void;
 }
 
 const WorkoutList: React.FC<WorkoutListProps> = ({ 
@@ -29,6 +30,7 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   onDelete, 
   onEdit,
   onShowHistory,
+  onOpenMaster,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<Workout | null>(null);
@@ -85,7 +87,13 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   return (
     <>
       <div className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <button
+              onClick={onOpenMaster}
+              className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+            >
+              種目マスター
+            </button>
             <button
               onClick={onShowHistory}
               className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
