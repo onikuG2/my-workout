@@ -6,6 +6,7 @@ export interface Exercise {
   sets?: number; // optional
   weight?: number; // optional, in kg
   reps?: number; // optional
+  superSetGroupId?: number; // optional, スーパーセットグループID（同じIDのエクササイズはスーパーセット）
 }
 
 export interface Workout {

@@ -22,5 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Test files
+test-download.json
+test-import.json
+playwright-report/
+test-results/
 .firebase/hosting.cHVibGlj.cache
 .firebase/hosting.ZGlzdA.cache

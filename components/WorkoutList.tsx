@@ -91,68 +91,77 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
   return (
     <>
       <div className="space-y-4">
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row justify-between gap-3">
             <button
               onClick={onOpenMaster}
-              className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+              className="flex items-center justify-center min-h-[44px] py-2.5 px-5 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-all duration-200 text-base active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500"
+              aria-label="種目マスターを開く"
             >
               種目マスター
             </button>
             <button
               onClick={onShowHistory}
-              className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+              className="flex items-center justify-center min-h-[44px] py-2.5 px-5 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-all duration-200 text-base active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500"
+              aria-label="ワークアウト履歴を表示"
             >
               <HistoryIcon className="w-5 h-5 mr-2" />
               ワークアウト履歴
             </button>
           </div>
           {workouts.length === 0 ? (
-              <div className="text-center py-12 px-6 bg-gray-700/50 rounded-lg">
-                  <h2 className="text-xl font-semibold text-gray-300">まだワークアウトがありません</h2>
-                  <p className="text-gray-400 mt-2">下のボタンをクリックして、最初のワークアウトを作成してください！</p>
+              <div className="text-center py-16 px-6 bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-600">
+                  <div className="text-6xl mb-4">💪</div>
+                  <h2 className="text-2xl font-bold text-gray-200 mb-2">まだワークアウトがありません</h2>
+                  <p className="text-gray-400 text-base mb-6">下のボタンをクリックして、最初のワークアウトを作成してください！</p>
               </div>
           ) : (
               workouts.map(workout => (
-              <div key={workout.id} className="bg-gray-700 p-4 rounded-lg flex items-center justify-between shadow-md transition-transform hover:scale-105 duration-200">
-                  <div>
-                  <h3 className="text-xl font-bold text-white">{workout.name}</h3>
-                  <div className="flex items-center text-sm text-gray-400 mt-1 space-x-4">
-                      <span>{workout.exercises.length} エクササイズ</span>
-                      <span className="flex items-center">
-                          <ClockIcon className="w-4 h-4 mr-1"/>
-                          {getTotalDuration(workout)}
-                      </span>
-                  </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                  <button 
-                      onClick={() => onStart(workout)}
-                      className="p-3 bg-green-500 rounded-full text-white hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-green-500 transition-colors"
-                      aria-label={`${workout.name} を開始`}
-                  >
-                      <PlayIcon className="w-5 h-5" />
-                  </button>
-                  <button 
-                      onClick={() => onEdit(workout)}
-                      className="p-3 bg-blue-500 rounded-full text-white hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 transition-colors"
-                      aria-label={`${workout.name} を編集`}
-                  >
-                      <PencilIcon className="w-5 h-5" />
-                  </button>
-                  <button 
-                      onClick={() => openDeleteConfirmation(workout)}
-                      className="p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-colors"
-                      aria-label={`${workout.name} を削除`}
-                  >
-                      <TrashIcon className="w-5 h-5" />
-                  </button>
+              <div key={workout.id} className="bg-gray-700 p-5 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-gray-700/90 border border-gray-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-white mb-2">{workout.name}</h3>
+                          <div className="flex flex-wrap items-center gap-4 text-base text-gray-300">
+                              <span className="flex items-center font-medium">
+                                  <span className="text-cyan-400 mr-1">📋</span>
+                                  {workout.exercises.length} エクササイズ
+                              </span>
+                              <span className="flex items-center font-medium">
+                                  <ClockIcon className="w-5 h-5 mr-1.5 text-cyan-400"/>
+                                  {getTotalDuration(workout)}
+                              </span>
+                          </div>
+                      </div>
+                      <div className="flex items-center justify-end sm:justify-start gap-3 flex-shrink-0">
+                          <button 
+                              onClick={() => onStart(workout)}
+                              className="min-w-[44px] min-h-[44px] p-3 bg-cyan-500 rounded-full text-white hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 transition-all duration-200 active:scale-95"
+                              aria-label={`${workout.name} を開始`}
+                          >
+                              <PlayIcon className="w-6 h-6" />
+                          </button>
+                          <button 
+                              onClick={() => onEdit(workout)}
+                              className="min-w-[44px] min-h-[44px] p-3 bg-gray-600 rounded-full text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500 transition-all duration-200 active:scale-95"
+                              aria-label={`${workout.name} を編集`}
+                          >
+                              <PencilIcon className="w-6 h-6" />
+                          </button>
+                          <button 
+                              onClick={() => openDeleteConfirmation(workout)}
+                              className="min-w-[44px] min-h-[44px] p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-all duration-200 active:scale-95"
+                              aria-label={`${workout.name} を削除`}
+                          >
+                              <TrashIcon className="w-6 h-6" />
+                          </button>
+                      </div>
                   </div>
               </div>
               ))
           )}
           <button
               onClick={onCreate}
-              className="w-full flex items-center justify-center py-3 px-6 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 transition-all duration-200 transform hover:scale-102"
+              className="w-full flex items-center justify-center min-h-[52px] py-3.5 px-6 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500 transition-all duration-200 active:scale-98 text-base"
+              aria-label="新しいワークアウトを作成"
           >
               <PlusIcon className="w-6 h-6 mr-2" />
               新しいワークアウトを作成
@@ -161,7 +170,8 @@ const WorkoutList: React.FC<WorkoutListProps> = ({
           <div className="border-t border-gray-700 pt-4 mt-4 space-y-4">
               <button
                 onClick={() => setIsPresetModalOpen(true)}
-                className="w-full flex items-center justify-center py-2 px-4 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors"
+                className="w-full flex items-center justify-center min-h-[44px] py-2.5 px-4 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 transition-all duration-200 active:scale-95 text-base"
+                aria-label="おすすめワークアウトを追加"
               >
                   <SparklesIcon className="w-5 h-5 mr-2" />
                   おすすめワークアウトを追加

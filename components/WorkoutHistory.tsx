@@ -89,18 +89,23 @@ const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBa
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-cyan-400">ワークアウト履歴</h2>
-            <button onClick={onBack} className="flex items-center text-cyan-400 hover:text-cyan-300">
+        <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-cyan-400">ワークアウト履歴</h2>
+            <button 
+                onClick={onBack} 
+                className="flex items-center min-h-[44px] py-2 px-4 text-cyan-400 hover:text-cyan-300 hover:bg-gray-700/50 rounded-lg transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-cyan-500"
+                aria-label="一覧に戻る"
+            >
                 <ChevronLeftIcon className="w-5 h-5 mr-1" />
-                一覧に戻る
+                <span className="text-base">一覧に戻る</span>
             </button>
         </div>
         
         {sortedHistory.length === 0 ? (
-          <div className="text-center py-12 px-6 bg-gray-700/50 rounded-lg">
-            <h2 className="text-xl font-semibold text-gray-300">まだ完了したワークアウトがありません</h2>
-            <p className="text-gray-400 mt-2">ワークアウトを完了すると、ここに記録が表示されます。</p>
+          <div className="text-center py-16 px-6 bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-600">
+            <div className="text-6xl mb-4">📊</div>
+            <h2 className="text-2xl font-bold text-gray-200 mb-2">まだ完了したワークアウトがありません</h2>
+            <p className="text-gray-400 text-base">ワークアウトを完了すると、ここに記録が表示されます。</p>
           </div>
         ) : (
           sortedHistory.map(entry => (
@@ -116,30 +121,37 @@ const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBa
                 />
               </div>
               
-              <div className="bg-gray-700 p-4 rounded-lg flex items-center justify-between shadow-md">
-                <div>
-                  <h3 className="text-xl font-bold text-white">{entry.workoutName}</h3>
-                  <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-400 mt-1 sm:space-x-4">
-                    <span>{formatDate(entry.completedAt)}</span>
-                    <span className="flex items-center mt-1 sm:mt-0">
-                      <ClockIcon className="w-4 h-4 mr-1" />
+              <div className="bg-gray-700 p-5 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg border border-gray-600">
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{entry.workoutName}</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm sm:text-base text-gray-300">
+                    <span className="flex items-center">
+                      <span className="text-gray-500 mr-1">📅</span>
+                      {formatDate(entry.completedAt)}
+                    </span>
+                    <span className="flex items-center">
+                      <ClockIcon className="w-5 h-5 mr-1.5 text-cyan-400"/>
                       {formatDuration(entry.totalDuration)}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end sm:justify-start gap-3 flex-shrink-0">
                   <button
                     onClick={() => handleGenerateAndTweet(entry)}
                     disabled={isGeneratingImage === entry.id}
-                    className="p-3 bg-sky-500 rounded-full text-white hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-sky-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="min-w-[44px] min-h-[44px] p-3 bg-sky-500 rounded-full text-white hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-sky-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                     aria-label={`${entry.workoutName} を画像でツイート`}
                     title={isGeneratingImage === entry.id ? '画像生成中...' : '画像でツイート'}
                   >
-                    <TwitterIcon className="w-5 h-5" />
+                    {isGeneratingImage === entry.id ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <TwitterIcon className="w-5 h-5" />
+                    )}
                   </button>
                   <button
                     onClick={() => tweetHistoryEntry(entry)}
-                    className="p-3 bg-gray-600 rounded-full text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-600 transition-colors"
+                    className="min-w-[44px] min-h-[44px] p-3 bg-gray-600 rounded-full text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-600 transition-all duration-200 active:scale-95"
                     aria-label={`${entry.workoutName} をテキストでツイート`}
                     title="テキストでツイート"
                   >
@@ -147,7 +159,7 @@ const WorkoutHistory: React.FC<WorkoutHistoryProps> = ({ history, onDelete, onBa
                   </button>
                   <button
                     onClick={() => openDeleteConfirmation(entry)}
-                    className="p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-colors"
+                    className="min-w-[44px] min-h-[44px] p-3 bg-red-600 rounded-full text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-600 transition-all duration-200 active:scale-95"
                     aria-label={`履歴 ${entry.workoutName} を削除`}
                   >
                     <TrashIcon className="w-5 h-5" />

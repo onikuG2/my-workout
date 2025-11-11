@@ -161,10 +161,13 @@ const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkouts
   
   return (
     <div>
-      <div className="flex justify-center gap-4">
+      <p className="text-xs text-gray-500 mb-3 text-center">
+        ワークアウトデータをファイルとして保存・読み込みできます。バックアップや別デバイスへの移行に便利です。
+      </p>
+      <div className="flex flex-col sm:flex-row justify-center gap-3">
         <button
             onClick={handleExport}
-            className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+            className="flex items-center justify-center min-h-[44px] py-2.5 px-5 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500 text-sm"
             aria-label="データをファイルにエクスポートする"
         >
           <DownloadIcon className="w-4 h-4 mr-2"/>
@@ -172,7 +175,7 @@ const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkouts
         </button>
         <button
             onClick={handleImportClick}
-            className="flex items-center justify-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-colors text-sm"
+            className="flex items-center justify-center min-h-[44px] py-2.5 px-5 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500 text-sm"
             aria-label="ファイルからデータをインポートする"
         >
           <UploadIcon className="w-4 h-4 mr-2"/>
@@ -184,6 +187,7 @@ const LocalFileSync: React.FC<LocalFileSyncProps> = ({ localWorkouts, onWorkouts
             onChange={handleFileChange}
             accept=".json"
             className="hidden"
+            aria-label="ファイル選択"
         />
       </div>
       <ImportConfirmModal
