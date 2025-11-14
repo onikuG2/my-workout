@@ -103,6 +103,27 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
   const currentExercise = !isFinished ? workout?.exercises?.[exerciseIndex] : undefined;
   const totalSets = currentExercise?.sets || 1;
 
+  // スーパーセット情報を取得
+  const getSuperSetInfo = useMemo(() => {
+    if (!currentExercise?.superSetGroupId) return null;
+    
+    const groupId = currentExercise.superSetGroupId;
+    const superSetExercises = workout.exercises
+      .map((ex, idx) => ({ exercise: ex, index: idx }))
+      .filter(({ exercise }) => exercise.superSetGroupId === groupId);
+    
+    const currentSuperSetIndex = superSetExercises.findIndex(({ index }) => index === exerciseIndex);
+    
+    return {
+      groupId,
+      exercises: superSetExercises,
+      currentIndex: currentSuperSetIndex,
+      totalCount: superSetExercises.length,
+    };
+  }, [currentExercise, workout, exerciseIndex]);
+
+  const isInSuperSet = !!getSuperSetInfo;
+
   const playCompletionSound = useCallback(() => {
     if (!audioContextRef.current) return;
 
@@ -822,14 +843,65 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
     <div className="flex flex-col items-center p-4">
         <header className="w-full text-center mb-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-cyan-400">{workout.name}</h2>
-            <p className="text-gray-400 text-sm sm:text-base">{exerciseIndex + 1} / {workout.exercises.length}</p>
+            <div className="flex items-center justify-center gap-3 mt-2">
+              {isInSuperSet && getSuperSetInfo && (
+                <span className="text-xs font-semibold text-purple-400 bg-purple-900/50 px-3 py-1 rounded-full border border-purple-500/50">
+                  スーパーセット
+                </span>
+              )}
+              <p className="text-gray-400 text-sm sm:text-base">{exerciseIndex + 1} / {workout.exercises.length}</p>
+            </div>
         </header>
 
-        <div className={`relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 my-8 flex items-center justify-center rounded-full ${phase === 'rest' ? 'bg-green-500/10 ring-4 ring-green-500/30' : phase === 'work' ? 'bg-cyan-500/10 ring-4 ring-cyan-500/30' : 'bg-yellow-500/10 ring-4 ring-yellow-500/30'} transition-all duration-500`}>
+        {/* スーパーセット内のエクササイズ一覧 */}
+        {isInSuperSet && getSuperSetInfo && (
+          <div className="w-full max-w-md mb-4 px-4">
+            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+              <p className="text-xs text-purple-400 mb-2 font-semibold">スーパーセット内のエクササイズ</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {getSuperSetInfo.exercises.map(({ exercise, index }, idx) => (
+                  <div
+                    key={index}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      idx === getSuperSetInfo.currentIndex
+                        ? 'bg-purple-600 text-white ring-2 ring-purple-400'
+                        : idx < getSuperSetInfo.currentIndex
+                        ? 'bg-purple-700/50 text-purple-200'
+                        : 'bg-gray-700/50 text-gray-400'
+                    }`}
+                  >
+                    {exercise.name}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-purple-300 mt-2 text-center">
+                {getSuperSetInfo.currentIndex + 1} / {getSuperSetInfo.totalCount}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className={`relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 my-8 flex items-center justify-center rounded-full ${
+          isInSuperSet 
+            ? phase === 'rest' 
+              ? 'bg-green-500/10 ring-4 ring-green-500/30' 
+              : 'bg-purple-500/10 ring-4 ring-purple-500/30'
+            : phase === 'rest' 
+              ? 'bg-green-500/10 ring-4 ring-green-500/30' 
+              : phase === 'work' 
+              ? 'bg-cyan-500/10 ring-4 ring-cyan-500/30' 
+              : 'bg-yellow-500/10 ring-4 ring-yellow-500/30'
+        } transition-all duration-500`}>
             <svg className="absolute w-full h-full" viewBox="0 0 100 100">
                 <circle className="text-gray-700" strokeWidth="5" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
                 <circle
-                    className={`${phase === 'rest' ? 'text-green-400' : 'text-cyan-400'} transition-all duration-500`}
+                    className={`${
+                      isInSuperSet && phase !== 'rest'
+                        ? 'text-purple-400'
+                        : phase === 'rest' 
+                        ? 'text-green-400' 
+                        : 'text-cyan-400'
+                    } transition-all duration-500`}
                     strokeWidth="5"
                     strokeDasharray={2 * Math.PI * 45}
                     strokeDashoffset={(2 * Math.PI * 45) * (1 - progress / 100)}
@@ -841,7 +913,15 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
                 />
             </svg>
             <div className="z-10 text-center">
-                <p className={`text-lg sm:text-xl font-semibold uppercase tracking-widest mb-2 ${phase === 'work' ? 'text-cyan-400' : phase === 'rest' ? 'text-green-400' : 'text-yellow-400'}`}>
+                <p className={`text-lg sm:text-xl font-semibold uppercase tracking-widest mb-2 ${
+                  isInSuperSet && phase !== 'rest'
+                    ? 'text-purple-400'
+                    : phase === 'work' 
+                    ? 'text-cyan-400' 
+                    : phase === 'rest' 
+                    ? 'text-green-400' 
+                    : 'text-yellow-400'
+                }`}>
                   {phase === 'work' && 'ワーク'}
                   {phase === 'rest' && '休憩'}
                   {phase === 'rep_wait' && '準備'}
@@ -852,6 +932,11 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
                     <div className="text-5xl sm:text-6xl font-mono font-bold">{formatTime(timeLeft)}</div>
                 )}
                 <p className="text-gray-400 mt-2 text-sm sm:text-base">セット {setIndex + 1} / {totalSets}</p>
+                {isInSuperSet && getSuperSetInfo && (
+                  <p className="text-purple-400 mt-1 text-xs font-medium">
+                    スーパーセット {getSuperSetInfo.currentIndex + 1} / {getSuperSetInfo.totalCount}
+                  </p>
+                )}
             </div>
         </div>
 
@@ -859,8 +944,19 @@ const WorkoutPlayer: React.FC<WorkoutPlayerProps> = ({ workout, onFinish }) => {
             <h3 className="text-xl sm:text-2xl font-semibold mb-1">{currentExercise.name}</h3>
             {currentExercise.weight != null && currentExercise.weight !== 0 && <p className="text-gray-400 text-base sm:text-lg mb-2">{currentExercise.weight} kg</p>}
             {exerciseIndex < workout.exercises.length - 1 && (
-                <div className="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
-                    <p className="text-xs text-gray-500 mb-1">次</p>
+                <div className={`mt-3 p-3 rounded-lg border ${
+                  workout.exercises[exerciseIndex + 1].superSetGroupId === currentExercise.superSetGroupId
+                    ? 'bg-purple-900/30 border-purple-500/50'
+                    : 'bg-gray-800/50 border-gray-700'
+                }`}>
+                    <p className={`text-xs mb-1 ${
+                      workout.exercises[exerciseIndex + 1].superSetGroupId === currentExercise.superSetGroupId
+                        ? 'text-purple-400'
+                        : 'text-gray-500'
+                    }`}>
+                      次
+                      {workout.exercises[exerciseIndex + 1].superSetGroupId === currentExercise.superSetGroupId && '（スーパーセット内）'}
+                    </p>
                     <p className="text-sm sm:text-base text-gray-300 font-medium">{workout.exercises[exerciseIndex + 1].name}</p>
                     {workout.exercises[exerciseIndex + 1].duration > 0 && (
                         <p className="text-xs text-gray-500 mt-1">{workout.exercises[exerciseIndex + 1].duration}秒</p>
